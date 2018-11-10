@@ -812,3 +812,144 @@ class ISPDesktopDisplay:LiveScoreDisplay, TwitterFeedDisplay, SmartStatsDisplay{
 ```
 
 We can observe that, in all the above three classes, we are not forcing any class to implement a method that they do not use. We achieved ISP by defining multiple protocols.
+
+**5) SOLID - Dependency Inversion Principle (DIP):**
+
+Definition:
+ 
+In short, Dependency inversion principle says, depend on abstractions, not on concretions. High level modules should not depend upon low level modules. Both should depend upon abstractions.
+ 
+Abstractions should not depend upon details. Details should depend upon abstractions. By depending on higher-level abstractions, we can easily change one instance with another instance in order to change the behavior. DIP increases the reusability and flexibility of our code.
+ 
+Usage:
+ 
+Let us assume we are designing a small system where we want to list all the wickets taken by a bowler in his cricketing career from the database.
+
+```
+import Foundation
+import UIKit
+ 
+enum WicketsColumn{
+    case wicketTakenBy
+    case wicketGivenTo
+}
+ 
+class Cricketer{
+    var name = ""
+    
+    init(_ name:String){
+        self.name = name
+    }
+    
+}
+```
+We define an enum called WicketsColumn with a list of two possible cases. We then define a class called Cricketer which takes the parameter of name of type String for its initialisation.
+
+```
+protocol WicketsTallyBrowser{
+    func returnAllWicketsTakenByBowler(_ name:String) -> [Cricketer]
+}
+```
+
+We define a protocol named WicketsTallyBrowser which has a function to return all the wickets taken by a given bowler as array of type Cricketer.
+ 
+We will now define a class/ a storage which stores relationship between bowlers and batsmen.
+
+```
+class WicketsTally : WicketsTallyBrowser { //Low Level
+     var wickets = [(Cricketer, WicketsColumn, Cricketer)]()
+    
+    func addToTally(_ bowler : Cricketer,_ batsman : Cricketer){
+        wickets.append((bowler, .wicketTakenBy, batsman))
+        wickets.append((batsman, .wicketGivenTo, bowler))
+    }
+    
+    func returnAllWicketsTakenByBowler(_ name: String) -> [Cricketer] {
+        return wickets.filter({$0.name == name && $1 == WicketsColumn.wicketTakenBy && $2 != nil})
+            .map({$2})
+    }
+    
+}
+```
+
+We define a class called WicketsTally conforming to WicketsTallyBrowser protocol. It has a variable called wickets which is an array of tuples where each of the tuples has three attributes, one each of type Cricketer, WicketsColumn and Cricketer in the order.
+ 
+Then we define a method called addToTally which takes parameters of bowler and batsman of type Cricketer. It appends the same to wickets array but with different relationships available from WicketsColumn enum.
+ 
+In the definition of protocol method returnAllWicketsTakenByBowler, we filter the wickets array by comparing first attribute of tuple to the name of given bowler.
+
+```
+class PlayerStats{ //High Level
+    init(_ wicketsTally : WicketsTally){
+        let wickets = wicketsTally.wickets
+        for w in wickets where w.0.name == "BrettLee" && w.1 == .wicketTakenBy{
+            print("Brett Lee has a wicket of \(w.2.name)")
+        }
+    }
+}
+```
+We now define a class called PlayerStats where we use the logic written in WicketsTally class to return all the wickets taken by a particular bowler.
+ 
+Let us now write a main method to see this code in action:
+
+```
+func main(){
+    let bowler = Cricketer("BrettLee")
+    let batsman1 = Cricketer("Sachin")
+    let batsman2 = Cricketer("Dhoni")
+    let batsman3 = Cricketer("Dravid")
+    
+    let wicketsTally = WicketsTally()
+    wicketsTally.addToTally(bowler, batsman1)
+    wicketsTally.addToTally(bowler, batsman2)
+    wicketsTally.addToTally(bowler, batsman3)
+    
+    let _ = PlayerStats(wicketsTally)
+    
+}
+```
+
+Output in the Xcode console:
+ 
+Brett Lee has a wicket of Sachin
+Brett Lee has a wicket of Dhoni
+Brett Lee has a wicket of Dravid
+
+The issue with the above approach is its violation of DIP (it states that the high level modules should not directly depend on low level modules) as our PlayerStats class depends upon wickets array of WicketsTally class. It should be declared as a private variable so that no other class can manipulate the data directly.
+ 
+Let us now change the WicketsTally class this way:
+
+```
+class WicketsTally : WicketsTallyBrowser { //Low Level
+     private var wickets = [(Cricketer, WicketsColumn, Cricketer)]()
+    
+    func addToTally(_ bowler : Cricketer,_ batsman : Cricketer){
+        wickets.append((bowler, .wicketTakenBy, batsman))
+        wickets.append((batsman, .wicketGivenTo, bowler))
+    }
+    
+    func returnAllWicketsTakenByBowler(_ name: String) -> [Cricketer] {
+        return wickets.filter({$0.name == name && $1 == WicketsColumn.wicketTakenBy && $2 != nil})
+            .map({$2})
+    }
+    
+}
+```
+Now change the PlayerStats class to:
+
+```
+class PlayerStats{ //High Level
+    init(_ browser : WicketsTallyBrowser){
+        for w in browser.returnAllWicketsTakenByBowler("BrettLee"){
+            print("Brett Lee has a wicket of \(w.name)")
+        }
+    }
+}
+```
+Here we can observe that, instead of directly depending on wickets array from WicketsTally, PlayerStats is dependent on abstraction from WicketsTallyBrowser. Output in the Xcode console remains same but we are now adhering to DIP.
+
+Output in the Xcode console:
+ 
+Brett Lee has a wicket of Sachin
+Brett Lee has a wicket of Dhoni
+Brett Lee has a wicket of Dravid
