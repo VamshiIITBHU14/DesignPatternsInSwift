@@ -3093,3 +3093,237 @@ Summary:
  
 When you are in a situation where you want to hide the complexity of a data structure from clients and have a single interface for traversing the data structures, iterator design pattern serves you the best.
 
+**21) Behavioral - Interpreter Design Pattern:**
+
+Definition:
+
+Interpreters are present everywhere around us. In design patterns, interpreter is a component that processes structured text data. It falls under behavioral design pattern.
+
+Usage:
+
+Let us use iterator design pattern to get a way to access the elements of a collection object in sequential manner without any need to know its underlying representation.
+
+```
+import UIKit
+import Foundation
+ 
+protocol Iterator{
+     func hasNext() -> Bool
+     func next() -> String
+}
+
+protocol Container{
+    func getIterator() -> Iterator
+}
+```
+
+We define two protocols named Iterator and Container. Iterator has two functions to check if the there is next element present in array after every iteration and to return the element (if present). Container has a method to return the iterator.
+
+```
+class NameRepo : Container{
+    let names = ["India" ,"Australia", "England", "NewZealand"]
+    func getIterator() -> Iterator {
+        return NameIterator(names)
+    }
+}
+```
+
+We then define a class called NameRepo conforming to Container protocol. In our main function, we use iterator to print all the values present in names array.
+
+```
+private class NameIterator : Iterator{
+    var index = -1
+    var names = [String]()
+    
+    init(_ names : [String]){
+        self.names = names
+    }
+    
+    func hasNext() -> Bool {
+        if index < names.count {
+            return true
+        }
+        return false
+    }
+    
+    func next() -> String {
+        if self.hasNext(){
+             index = index + 1
+            return names[index]
+        } else{
+            return ""
+        }
+    }
+}
+```
+
+We define a class called NameIterator conforming to Iterator protocol. It takes a parameter of type String array during its initialisation. 
+ 
+Let us write a main function to see the code in action:
+
+```
+func main(){
+    let nr = NameRepo()
+    let iterator = NameIterator(nr.names)
+  
+    for _ in nr.names{
+        iterator.hasNext()
+        print(iterator.next())
+    }
+}
+ 
+main()
+```
+
+Output in the Xcode console:
+ 
+India
+Australia
+England
+NewZealand
+
+**22) Behavioral - Mediator Design Pattern:**
+
+
+Definition:
+Mediator is a behavioural design pattern that lets us define a component that encapsulates relationships between a set of components (that absolutely makes no sense to have direct references to one another) to make them independent of each other. Mediator pattern prevents direct communication between individual components by sending requests to a central component which knows whom to redirect those requests.
+Usage:
+Let us assume we are designing a TV Umpire decision review system for a cricket match. When an on-field umpire does not have enough evidence to rule a batsman out, he sends the request to TV umpire who takes a look at the replays and sends a command to the Monitor operator who displays the final decision on the big screen in the ground. 
+Let’s see how we can use Mediator design pattern to design such decision review system.
+
+```
+import UIKit
+import Foundation
+ 
+protocol Command{
+    func displayStatus()
+}
+```
+
+ 
+We write a protocol Command which defines a function called displayStatus.
+
+```
+protocol RemoteUmpire{
+    func registerTVDisplay(tvDisplay :TVDisplay)
+    func registerTVOperator(tvOperator : TVOperator)
+    func isDecisionMade() -> Bool
+    func setDecisionStatus(status : Bool)
+}
+```
+
+We write another protocol called RemoteUmpire which defines handful of functionalities. 
+ 
+The remote umpire ( also called TV umpire) has to register for TV display by passing a parameter of type TVDisplay (to be defined).
+The remote umpire ( also called TV umpire) has to register for TV operator by passing a parameter of type TVOperator (to be defined).
+A function named isDecisionMade which returns a boolean.
+Another function to set the status of decision by passing a boolean argument. 
+
+```
+class TVOperator : Command{
+    var tvUmpire:TVUmpire
+    
+    init(_ tvUmpire : TVUmpire){
+        self.tvUmpire = tvUmpire
+    }
+    
+    func displayStatus() {
+        if tvUmpire.isDecisionMade(){
+            print("Decision Made and Batsman in OUT")
+            tvUmpire.setDecisionStatus(status: true)
+        } else{
+             print("Decision Pending")
+        }
+    }
+    
+    func getReady(){
+        print("Ready to Display Decision")
+    }
+}
+```
+
+We define a class called TVOperator conforming to Command protocol. It takes an object of type TVUmpire (to be defined) during its initialisation.
+ 
+It has a method named displayStatus which based on tv umpire’s decision displays a batsman out or not on the big screen in the stadium.
+
+```
+class TVDisplay : Command{
+    var tvUmpire:TVUmpire
+    
+    init(_ tvUmpire : TVUmpire) {
+        self.tvUmpire = tvUmpire
+        tvUmpire.setDecisionStatus(status: true)
+    }
+ 
+    func displayStatus() {
+        print("Decision made and permission granted to display the decision on TV Display")
+        tvUmpire.setDecisionStatus(status: true)
+    }
+}
+```
+
+We define a class called TVDisplay conforming to Command protocol. This class also takes an object of type TVUmpire (to be defined) for its initialisation. Its main functionality is to display the status of decision based on the input given by TV umpire.
+
+```
+class TVUmpire : RemoteUmpire{
+    private var tvOperator : TVOperator?
+    private var tvDisplay : TVDisplay?
+    private var decisionMade : Bool?
+    
+    func registerTVDisplay(tvDisplay: TVDisplay) {
+        self.tvDisplay = tvDisplay
+    }
+    
+    func registerTVOperator(tvOperator: TVOperator) {
+        self.tvOperator = tvOperator
+    }
+    
+    func isDecisionMade() -> Bool {
+        return decisionMade!
+    }
+    
+    func setDecisionStatus(status: Bool) {
+        self.decisionMade = status
+    }
+}
+```
+We then define our most important class named TVUmpire conforming to RemoteUmpire protocol. It has three private optional variables defined namely, tvOperator of type TVOperator, tvDisplay of type TYDisplay and a boolen named decisonMade.
+ 
+It registers for TV display by assigning its property of tvDisplay to parameter of type TVDisplay from the method registerTVDisplay. 
+ 
+It registers for TV operator by assigning its property of tvOperator to parameter of type TVOperator from the method registerTVOperator. 
+ 
+Let’s now write our main function and see how the above code comes into action.
+
+```
+func main(){
+    let tvUmpire = TVUmpire()
+    let tvDisplayAtGround = TVDisplay(tvUmpire)
+    let tvOperatorAtGround = TVOperator(tvUmpire)
+    tvUmpire.registerTVDisplay(tvDisplay: tvDisplayAtGround)
+    tvUmpire.registerTVOperator(tvOperator: tvOperatorAtGround)
+    tvOperatorAtGround.getReady()
+    tvDisplayAtGround.displayStatus()
+    tvOperatorAtGround.displayStatus()
+    
+}
+ 
+main()
+```
+
+ 
+We take an instance of TVUmpire and pass the same instance to initialise TVDisplay and TVOperator. 
+ 
+TVUmpire then registers for TVDisplay and TVUmpire by passing instances of TVDisplay and TVUmpire respectively. 
+ 
+Once the TV umpire has made his decision, TV operator at ground gets ready to display the status of decision accordingly on the display at ground.
+ 
+Output in the Xcode console:
+Ready to Display Decision
+Decision made and permission granted to display the decision on TV Display
+Decision Made and Batsman in OUT
+ 
+Summary:
+ 
+Use a mediator design pattern when the complexity of object communication begins to hinder object reusability. Mediator engages in two way communication with its connected components.
+
