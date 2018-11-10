@@ -1970,6 +1970,148 @@ Summary:
  
 When you are in a situation to simplify the code at client’s end that has to interact with a complex tree structure, then go for Composite design pattern. In other words, it should be used when clients need to ignore the difference between compositions of objects and individual objects.
 
+**13) Structural - Decorator Design Pattern:**
+
+Definition:
+
+Decorator is a structural design pattern lets us add new behavior to the objects without altering the class itself. It helps us in keeping the new functionalities separate without having to rewrite existing code.
+
+Usage:
+
+Assume we are checking if a player is fit for playing T20 game of cricket as a bowler or batsman or both or none based on his batting and bowling statistics. Let us see how Decorator design pattern can help us here.
+```
+import UIKit
+import Foundation
  
+class T20Batsman{
+    
+    var strikeRate : Int = 0
+    
+    func makeRuns() -> String{
+        return (strikeRate > 130) ? "Fit for T20 Team as Batsman" : "Too slow Batsman for T20 Team"
+    }
+    
+}
+```
+We write a class called T20Batsman with a property called strikeRate of type Int. It has a function defined called makeRuns which tells us if the batsman is fit for T20 team based on his strikeRate. If the strike rate is more than 130, he is fit as T20 batsman, else he is too slow for the game.
+
+```
+class T20Bolwer{
+    
+    var economyRate : Float = 0
+    
+    func bowlEconomically () -> String{
+        return (economyRate < 8.0) ? "Fit for T20 Team as Bowler" : "Too expensive as a Bowler"
+    }
+    
+}
+```
+
+We then define a class called T20Bolwer with a property called economyRate of type Float. It has a function defined called bowlEconomically which tells us if the bowler is fit for T20 team based on his economyRate. If the economy rate is less than 8.0, he is fit as T20 bowler, else he is too expensive as a bowler for the game.
+ 
+```
+class T20AllRounder : CustomStringConvertible{
+    private var _strikeRate : Int = 0
+    private var _economyRate : Float = 0
+    
+    private let t20Batsman = T20Batsman()
+    private let t20Bowler = T20Bolwer()
+    
+    
+    func makeRuns() -> String{
+        return t20Batsman.makeRuns()
+    }
+    
+    func bowlEconomically() -> String{
+        return t20Bowler.bowlEconomically()
+    }
+    
+    var strikeRate : Int{
+        get {return _strikeRate}
+        set(value){
+            t20Batsman.strikeRate = value
+            _strikeRate = value
+        }
+    }
+    
+    var economyRate : Float{
+        get {return _economyRate}
+        set(value){
+            t20Bowler.economyRate = value
+            _economyRate = value
+        }
+    }
+    
+    var description: String{
+        if t20Batsman.strikeRate > 130 && t20Bowler.economyRate < 8 {
+            return "Fit as T20 AllRounder"
+        }
+        else{
+        var buffer = ""
+        buffer += t20Batsman.makeRuns()
+        buffer += " & " + t20Bowler.bowlEconomically()
+        return buffer
+        }
+    }
+}
+```
+
+We now define a class for T20AllRounder conforming to CustomStringConvertible. All rounder is someone in cricket who can bat and bowl reasonably good. It has got four private variables strikeRate and economyRate of type Int and Float respectively. Two more variables of type T20Batsman and T20Bowler.
+ 
+Now this allrounder should be able to make runs and bowl well. So it has got two functions defined:
+ 
+makeRuns: Here we use the instance of T20Batsman variable to call the makeRuns method and see if he is fit as T20Batsman based on defined criteria for strike rate
+ 
+bowlEconomically: Here we use the instance of T20Bowler variable to call the bowlEconomically method and see if he is fit as T20Bowler based on defined criteria for economy rate.
+  
+In case, in future if we want to change the conditions for batsmen or bowler or both, we do not have to disturb the code written for allrounder class. Just changing the code in T20Batsman and T20Bowler classes will be enough.
+ 
+Let us now write a main function to see the code in action:
+
+```
+func main(){
+    
+    let t20AllRounder = T20AllRounder()
+    t20AllRounder.strikeRate = 120
+    t20AllRounder.economyRate = 7
+    print(t20AllRounder.description)
+ 
+}
+ 
+main()
+```
+
+We take an instance of T20AllRounder class and feed in the strikeRate and economyRate and see if certain player is fit or not.
+ 
+Output in the Xcode console:
+ 
+Too slow Batsman for T20 Team & Fit for T20 Team as Bowler
+ 
+Keep changing the inputs for strikeRate and economyRate and see if the player is fit for T20 game of cricket.
+
+```t20AllRounder.strikeRate = 150
+t20AllRounder.economyRate = 7
+```
+ 
+Prints : Fit as T20 AllRounder
+ 
+```
+t20AllRounder.strikeRate = 150
+t20AllRounder.economyRate = 9
+```
+ 
+Prints: Fit for T20 Team as Batsman & Too expensive as a Bowler
+ 
+```
+t20AllRounder.strikeRate = 120
+t20AllRounder.economyRate = 9
+```
+ 
+Prints: Too slow Batsman for T20 Team & Too expensive as a Bowler
+ 
+Summary:
+ 
+If you are in a situation where you are looking for something flexible than class inheritance and need to edit/ update behaviors at runtime, then Decorator design pattern serves you better.
+
 
 
