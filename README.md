@@ -11,3 +11,41 @@ scenario where you would apply such a design pattern, and code an example for yo
 I believe that’s how coding is learned. Happy learning!
 
 There are 28 design patterns divided into SOLID, Creational, Structural, Behavioral categories. You can take code from each of the swift files and run in Xcode playground to see the output.
+
+**1)SOLID - Open Closed Principle**
+
+Definition:
+
+Single responsibility principle says a class should have one, and only one, reason to change. Every class should be responsible for a single part of the functionality, and that responsibility should be entirely encapsulated by the class. This makes your software easier to implement and prevents unexpected side-effects of future changes.
+
+Usage:
+
+Let us design an imaginary operation system for a Cricket tournament. For the sake of simplicity, let us have two major operations. A TeamRegister class which helps for checking-in and checking-out cricketers. A TeamConveyance class which is used to drop the players from hotel to stadium and pick them up from stadium after the match is over.
+
+Every class is assigned its own responsibility and they will be responsible only for that action.
+
+```import UIKit
+import Foundation
+ 
+class TeamRegister : CustomStringConvertible{
+    
+    var teamMembers = [String]()
+    var memberCount = 0
+    
+    func checkInGuest (_ name : String) -> Int{
+        
+        memberCount += 1
+        teamMembers.append("\(memberCount) - \(name)")
+        return memberCount - 1
+        
+    }
+    
+    func checkOutGuest (_ index : Int) {
+        teamMembers.remove(at: index)
+    }
+    
+    var description: String{
+        return teamMembers.joined(separator: "\n")
+    }
+}
+```
