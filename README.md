@@ -3327,3 +3327,263 @@ Summary:
  
 Use a mediator design pattern when the complexity of object communication begins to hinder object reusability. Mediator engages in two way communication with its connected components.
 
+**23) Behavioral - Memento Design Pattern:**
+
+Definition:
+
+Memento is a behavioural design pattern that lets us save the snapshots of the object’s internal state at every point of time without exposing its internal structure. This helps us in rolling back to the state when snapshot was taken. 
+
+Usage:
+
+Assume we are adding the stats of a cricketer (number of runs scored) year by year in our program and at some point of time we want to trace back to an year in the past and check his stats till that point of time.
+ 
+Let’s define a Memento class which takes an argument of number of runs scored in its initialisation.
+
+```
+import UIKit
+class Memento {
+    let numberOfRunsScored : Int
+    
+    init(_ numberOfRunsScored : Int){
+        self.numberOfRunsScored = numberOfRunsScored
+    }
+}
+```
+
+Let’s assume an imaginary hardware named StatsHolder which displays the stats. It conforms to CustomStringConvertible protocol. It takes an argument of number of runs scored in its initialisation.
+
+```
+class StatsHolder : CustomStringConvertible{
+    
+    private var numberOfRunsScored : Int
+    private var snapshots : [Memento] = []
+    private var currentIndex = 0
+ 
+ 
+    
+    init(_ numberOfRunsScored : Int) {
+        self.numberOfRunsScored = numberOfRunsScored
+        snapshots.append(Memento(numberOfRunsScored))
+    }
+    
+    var description: String{
+        return "Total Runs scored = \(numberOfRunsScored)"
+    }
+}
+```
+
+All the properties are declared private as we do not want to expose the internal structure of our hardware to the client.
+ 
+We maintain an array of snapshots of type Memento so that we can restore to past stats just by passing a memento. When the class in initialised, currentIndex starts at zero.
+ 
+We now add function add stats which takes number of runs as parameter and returns us a snapshot of type Memento. 
+
+```
+func addStatsToHolder (_ runsToBeAdded : Int) -> Memento{
+        numberOfRunsScored += runsToBeAdded
+        let snapshot = Memento(runsToBeAdded)
+        snapshots.append(snapshot)
+        currentIndex += 1
+        return snapshot
+    }
+```
+
+We keep appending the snapshot of Memento initialised to the array and increment the currentindex by 1. 
+ 
+We need a function that lets us restore to a past stat by passing a parameter of type Memento.
+
+```
+ func restoreToPastStat(_ memento : Memento?){
+        if let snap = memento{
+            numberOfRunsScored = snap.numberOfRunsScored
+            snapshots.append(snap)
+            currentIndex = snapshots.count - 1
+        }
+    }
+```
+
+Note that memento parameter is optional because for the currentindex value of 0 , we do not have anything to restore to. We change the numberOfRunsScored to the value of snapshot. We append the snapshot of parameter to our array and decrement the currentindex by 1.
+ 
+Now, we need methods to undo and redo stats.
+
+```
+func undoAStat() -> Memento?{
+        if currentIndex > 0{
+            currentIndex -= 1
+            let snap = snapshots[currentIndex]
+            numberOfRunsScored = snap.numberOfRunsScored
+            return snap
+        }
+        return nil
+    }
+    
+    func redoAStat() -> Memento?{
+        if currentIndex+1 < snapshots.count{
+            currentIndex += 1
+            let snap = snapshots[currentIndex]
+            numberOfRunsScored = snap.numberOfRunsScored
+            return snap
+        }
+        return nil
+    }
+```
+
+Note that returned Memento is optional as we may not have anything to undo for the first addition of stat and nothing to redo after final addition of stat. In these cases , we return a nil.
+ 
+In undoAStat method, we check if the currentIndex > 0. If no, we return nil. If yes, we decrement the currentIndex by 1 and get the snapshot at currentIndex. We then change the numberOfRunsScored to the value present in the snapshot.
+In redoAStat methog, we check if the currentIndex is less than the the count of snapshots decremented by 1. If no, we return nil. If yes, we increment the currentIndex by 1 and get the snapshot at currentIndex. We then change the numberOfRunsScored to the value present in the snapshot.
+ 
+We are done with our set up of Memento design pattern. Let’s see how we implement this pattern.
+
+```
+func main(){
+    let statsHolder = StatsHolder(1200) //1200 is the first stat (number of runs) we add to stats holder
+    let stat1 = statsHolder.addStatsToHolder(1400)
+    let stat2 = statsHolder.addStatsToHolder(700)
+    
+    print("a - ", statsHolder)
+    
+    //undo Top most operation
+    statsHolder.undoAStat()
+    print("b - ", statsHolder)
+    
+    //undo Top most operation
+    statsHolder.undoAStat()
+    print("c - ", statsHolder)
+    
+    //restoreToStat2
+    statsHolder.redoAStat()
+    print("d - ", statsHolder)
+    //There is no memento/snapshot when the StatsHolder is initialised
+}
+```
+
+In the main method, we initialise the StatsHolder by passing 1200 runs as the parameter. We then add a couple of stats by using addStatsToHolder method by passing 1400 and 700 runs as parameters.
+ 
+We then undo the last two stat addition by using undoAStat method on statsHolder. We then redo the last operation by using redoAStat method on statsHolder.
+ 
+Now run the main() method.
+
+```main()```
+Output in the Xcode console:
+
+a -  Total Runs scored = 3300
+b -  Total Runs scored = 1400
+c -  Total Runs scored = 1200
+d -  Total Runs scored = 1400
+
+Initially, we added three stats which takes the total to 3300. Then we undo one operation which takes the total to 1400 ( subtracting 700). One more undo takes us to the initial state of 1200. We redo the last undo operation which again takes us back to 1400. 
+
+Summary: 
+
+If your application demands to save checkpoints as the user progresses through the app, go for Memento design pattern. This helps in restoring to the checkpoints at later point of time.
+
+**24) Behavioral - Null Object Design Pattern:**
+
+Definition:
+
+In Object Oriented Programming, null is an object that has no referenced value. And when an object A tries to use an object B, object A assumes that object B is not nil. And when there is no option of telling A not to use instance of B when it has no value, Null Object design pattern comes into play. Null Object is a behavioural design pattern that simplifies the use of undefined dependencies.
+
+Usage:
+
+Let’s see how this design pattern can be used in code. 
+
+Assume we have a cricket match happening at a stadium and users receive live updates of the score on their devices (iPad or iPhone). By default, we show the score on the interface. But on iPad, along with the live score, we also show bowlers and batsman stats as there is available screen estate. But the same interface looks congested on iPhone display. So, we refrain ourselves from showing batsman and bowler stats for iPhone display. 
+
+```
+import Foundation
+ 
+protocol Log
+{
+    func bowlerStatsFromCurrentMatch(_ stats: String)
+    func batsmenStatsFromCurrentMatch(_ stats: String)
+}
+
+```
+
+We have a protocol named Log which defines two methods to show bowlers and batsmen stats from the current match which takes stats as input in String format. 
+
+```
+class StatsDisplayLog : Log
+{
+    func bowlerStatsFromCurrentMatch(_ stats: String) {
+        print(stats)
+    }
+    
+    func batsmenStatsFromCurrentMatch(_ stats: String) {
+         print(stats)
+    }
+}
+ 
+class NoDisplayStatsLog : Log
+{
+    func bowlerStatsFromCurrentMatch(_ stats: String) {}
+    func batsmenStatsFromCurrentMatch(_ stats: String) {}
+}
+
+```
+
+We now define two classes StatsDisplayLog and NoDisplayStatsLog both conforming to Log protocol. The only difference is the implementation of these methods in the classes which is very straight forward. We show the stats in StatsDisplayLog and do not show any stats in NoDisplayStatsLog. 
+
+```
+class UserInterface
+{
+    var log: Log
+    var runsScored = 0
+    var wicketsTaken = 0
+ 
+    init(_ log: Log)
+    {
+        self.log = log
+    }
+ 
+    func wicketTaken (){
+        wicketsTaken += 1
+        log.bowlerStatsFromCurrentMatch("Total Wickets : \(wicketsTaken)")
+    }
+    
+    func runsScored(numberOFRunsScored : Int){
+        runsScored += numberOFRunsScored
+        log.batsmenStatsFromCurrentMatch("Total Runs : \(runsScored)")
+    }
+    
+}
+```
+We define a class called UserInterface which takes care of the logic behind what to display to the users on their devices. This class takes a parameter of type Log during its initialisation. There are two methods to update the number of wickets taken and number of runs scored as and when an event happens in the match. With the help of instance of Log class, these stats are shown on the interface.
+Let’s now write a function called main.
+
+```
+func main()
+{
+    let ipadLog = StatsDisplayLog()
+    let iPAdUserInterface = UserInterface(ipadLog)
+    iPAdUserInterface.runsScored(numberOFRunsScored: 4)
+    iPAdUserInterface.runsScored(numberOFRunsScored: 3)
+    iPAdUserInterface.wicketTaken()
+   
+    
+}
+ 
+main()
+```
+
+Output in the Xcode console:
+
+Total Runs : 4
+Total Runs : 7
+Total Wickets : 1
+This is what an user sees on his iPad as we are taking an instance of StatsDisplayLog for iPad interface. Now, add the below code to the main function. 
+
+```
+let iPhoneLog = NoDisplayStatsLog()
+let iPhoneUserInterface = UserInterface(iPhoneLog)
+iPhoneUserInterface.runsScored(numberOFRunsScored: 6)
+iPhoneUserInterface.runsScored(numberOFRunsScored: 2)
+```
+
+We can observe that there is no change in the output in the Xcode console. This is because we are using an instance of NoDisplayStatsLog which is used for an iPhone interface.
+ 
+Summary:
+ 
+Null Object design pattern can be used in situations where real objects are replaced by null objects when the object is expected to do nothing.
+
