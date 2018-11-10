@@ -595,4 +595,220 @@ class AllRounder : BatsmanWhoCanBowl{
 
 We then define a new class named BatsmanWhoCanBowl with super class as Cricketer and define the extra method of  canBowl in this class.
 
+**4) SOLID - Interface Segregation Principle (ISP):**
 
+Definition:
+ 
+The only motto of Interface segregation principle is that the clients should not be forced to implement interfaces they don’t use. Client should not have the dependency on the interfaces that they do not use.
+ 
+Usage:
+ 
+Let us assume we are building a screen display for mobile, tablet, desktop interfaces of an app which is used to display live scores of a cricket match.
+We will see how this can be achieved without using ISP and then using ISP.
+ 
+
+```
+import UIKit
+import Foundation
+ 
+// Before ISP
+protocol MatchSummaryDisplay{
+    func showLiveScore()
+    func showCommentary()
+    func showLiveTwitterFeed()
+    func showSmartStats()
+}
+ 
+```
+
+
+We define a protocol named MatchSummaryDisplay which has four methods to show live score, commentary, twitter feed about the match and statistics of the players.
+
+```
+enum NoScreenEstate : Error
+{
+    case doesNotShowLiveTwitterFeed
+    case doesNotShowSmartStats
+}
+ 
+extension NoScreenEstate: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case .doesNotShowLiveTwitterFeed:
+            return NSLocalizedString("No Screen Estate to show Live Twitter Feed", comment: "Error")
+        case .doesNotShowSmartStats:
+            return NSLocalizedString("No Screen Estate to show Smart Stats", comment: "Error")
+        }
+    }
+}
+
+```
+
+By default, we want to show live score and commentary on the all types of devices like mobile, tablet, desktop. Showing twitter feed and statistics are optional, depending on the screen estate available on the device. So, we define an enum called NoScreenEstate with two possible cases. We also write an extension to it just to make the error descriptions more clear.
+
+```
+class DesktopDisplay:MatchSummaryDisplay{
+    func showLiveScore() {
+        print("Showing Live Score On Desktop")
+    }
+    
+    func showCommentary() {
+        print("Showing Commentary On Desktop")
+    }
+    
+    func showLiveTwitterFeed() {
+        print("Showing Live Twitter Feed On Desktop")
+    }
+    
+    func showSmartStats() {
+        print("Showing Smart Stats On Desktop")
+    }
+}
+```
+
+We start the interface design by defining a class called DesktopDisplay conforming to MatchSummaryDisplay. A desktop has enough screen space available and we show all the available data to the user.
+
+```
+class TabletDisplay:MatchSummaryDisplay{
+    func showLiveScore() {
+        print("Showing Live Score On Tablet")
+    }
+    
+    func showCommentary() {
+        print("Showing Commentary On Tablet")
+    }
+    
+    func showLiveTwitterFeed() {
+        print("Showing Live Twitter Feed On Tablet")
+    }
+    
+    func showSmartStats() {
+        do{
+            let error: Error = NoScreenEstate.doesNotShowSmartStats
+            print(error.localizedDescription)
+            throw error
+        } catch{
+            
+        }
+    }
+}
+```
+
+ 
+We then define another class called called TabletDisplay conforming to MatchSummaryDisplay. As the screen size of tablet is less when compared to desktop, we do not show smart stats on iPad display. We throw an error in showSmartStats method.
+
+```
+class MobileDisplay:MatchSummaryDisplay{
+    func showLiveScore() {
+        print("Showing Live Score On Mobile")
+    }
+    
+    func showCommentary() {
+        print("Showing Commentary On Mobile")
+    }
+    
+    func showLiveTwitterFeed() {
+        do{
+            let error: Error = NoScreenEstate.doesNotShowLiveTwitterFeed
+            print(error.localizedDescription)
+            throw error
+        } catch{
+            
+        }
+    }
+    
+    func showSmartStats() {
+        do{
+            let error: Error = NoScreenEstate.doesNotShowSmartStats
+            print(error.localizedDescription)
+            throw error
+        } catch{
+            
+        }
+    }
+}
+```
+
+We then define another class called called MobileDisplay conforming to MatchSummaryDisplay. As the screen size of mobile is small when compared to desktop and tablet, we do not show smart stats and twitter feed on mobile display. We throw an error in showLiveTwitterFeed and showSmartStats methods.
+ 
+As you can see, this approach violates ISP because TabletDisplay and MobileDisplay are forced to implement methods they are not using. Let’s see how we can use ISP in this scenario.
+
+```
+//Following ISP
+ 
+protocol LiveScoreDisplay{
+    func showLiveScore()
+    func showCommentary()
+}
+ 
+protocol TwitterFeedDisplay{
+    func showLiveTwitterFeed()
+}
+ 
+protocol SmartStatsDisplay{
+    func showSmartStats()
+}
+```
+
+Here we define a protocol named LiveScoreDisplay which is mandatory for all the screen sizes of the devices. Then we define different protocols called TwitterFeedDisplay and SmartStatsDisplay so that only the devices with enough screen sizes can conform to required protocols.
+
+```
+class ISPMobileDisplay:LiveScoreDisplay{
+    func showLiveScore() {
+        print("Showing Live Score On Mobile")
+    }
+    
+    func showCommentary() {
+        print("Showing Commentary On Mobile")
+    }
+}
+ 
+```
+
+ 
+We define a class called ISPMobileDisplay which conforms only to LiveScoreDisplay and we don’t have to force the class to implement any unwanted methods. 
+
+```
+class ISPTabletDisplay:LiveScoreDisplay, TwitterFeedDisplay{
+    
+    func showLiveScore() {
+        print("Showing Live Score On Tablet")
+    }
+    
+    func showCommentary() {
+        print("Showing Commentary On Tablet")
+    }
+    
+    func showLiveTwitterFeed() {
+        print("Showing Live Twitter Feed On Tablet")
+    }
+    
+}
+```
+
+We then define a class called ISPTabletDisplay which conforms to TwitterFeedDisplay along with LiveScoreDisplay.
+ 
+We can define desktop interface as follows.
+
+```
+class ISPDesktopDisplay:LiveScoreDisplay, TwitterFeedDisplay, SmartStatsDisplay{
+    
+    func showLiveScore() {
+        print("Showing Live Score On Desktop")
+    }
+    
+    func showCommentary() {
+        print("Showing Commentary On Desktop")
+    }
+    
+    func showLiveTwitterFeed() {
+        print("Showing Live Twitter Feed On Desktop")
+    }
+    
+    func showSmartStats() {
+        print("Showing Smart Stats On Desktop")
+    }
+}
+```
+
+We can observe that, in all the above three classes, we are not forcing any class to implement a method that they do not use. We achieved ISP by defining multiple protocols.
