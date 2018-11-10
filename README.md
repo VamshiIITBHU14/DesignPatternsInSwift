@@ -1484,5 +1484,166 @@ Summary:
  
 When you are in a situation to clone objects without coupling to their concrete classes, you can opt for Prototype design pattern which also helps in reducing repetitive initialization code.
 
+**9) Creational - Singleton Design Pattern:**
+
+When discussing which patterns to drop, we found that we still love them all (Not really - I am in favour of dropping Singleton. Its usage is almost always a design smell) - Erich Gamma (one of the Gang Four)
+
+Design pattern everyone loves to hate. Is it because it is actually bad or is it because of its abuse by the developers? Let’s see.
+
+Definition:
+
+Singleton is a creational design pattern that provides us with one of the best ways to create an object. This pattern ensures a class has only one instance and provides a global access to it so that the object can be used by all the other classes.
+
+Usage:
+
+Let us take the case of an API which returns some JSON response which when parsed looks like this:
+
+["Sachin" : 1, "Sehwag" : 2 , "Dravid" : 3, "Kohli" : 4, "Yuvraj" : 5 ,"Dhoni" : 6 ,"Jadeja" : 7 ,"Ashwin" : 8, "Zaheer" : 9 ,"Bhuvi" : 10, "Bumrah" : 11]
+
+This data-structure is an Array where each object is a key-value pair. Key represents the name of Indian Cricketer and Value represents the position at which the cricketer bats.
+
+We would need only one instance of the SingletonDatabase class in order to save this data to our database. There is no point in initialising database class more than once as it would just waste memory. Our code looks like this:
+
+```
+import UIKit
+class SingletonDatabase{
+    var dataSource = ["Sachin" : 1, "Sehwag" : 2 , "Dravid" : 3, "Kohli" : 4, "Yuvraj" : 5   ,"Dhoni" : 6 ,"Jadeja" : 7 ,"Ashwin" : 8, "Zaheer" : 9 ,"Bhuvi" : 10, "Bumrah" : 11]
+ 
+    var cricketers = [String:Int]()
+ 
+    static let instance = SingletonDatabase()
+    static var instanceCount = 0
+ 
+    private init(){
+        print("Initialising the singleton")
+        type(of: self).instanceCount += 1
+        for dataElement in dataSource{
+             cricketers[dataElement.key] = dataElement.value
+        }
+    }
+ 
+}
+```
+
+We first make a private initialiser which does not take any arguments. And that’s the like the simplest way to create on object. As it is private, no one can make another instance of the class.
+ 
+But how do we let someone access the SingletonDatabase? That’s where the Singleton pattern comes to play.
+ 
+We initialise a static variable with the only instance of SingletonDatabase class. Making it static restricts the ability to create multiple instances of class. 
+ 
+Now we add the data coming from API call to our array of cricketers. That’s it! We have our database ready.
+ 
+Now, how does someone have access to this database? Assume we want to know the position at which a cricketer bats. We write a function for that just after the private init() method in SingletonDatabase class.
+
+```
+func getRunsScoredByCricketer(name:String) -> Int{
+        if let position = cricketers[name]{
+            print("\(name) bats at number \(position) for Indian Crikcet Team")
+            return cricketers[name]!
+        }
+ 
+       print("Cricketer with name \(name) not found")
+       return 0
+}
+```
+This method is straightforward which takes name of the cricketer as an argument and returns his position in the line-up.
+ 
+Inorder for us to access this class at some point in our code, we write it this way:
+
+```
+func main(){
+    let singleton = SingletonDatabase.instance
+    singleton.getRunsScoredByCricketer(name: "Sachin")
+}
+```
+
+Very simple and short. We create a variable named singleton which helps us in accessing all the functions in our SingletonDatabase class. 
+ 
+Now run the main() method.
+
+```main()```
+
+Output in the Xcode console:
+
+Initialising the singleton
+Sachin bats at number 1 for Indian Cricket Team
+
+Change the name parameter to “Sach” and the output is:
+
+Initialising the singleton
+Cricketer with name Sach not found
+
+We missed out discussing variable named instanceCount in our private init() method. We can use this variable to show that there is only one instance of the SingletonDatabase class.
+ 
+ 
+Change the main method this way.
+
+```
+func main(){
+    let singleton1 = SingletonDatabase.instance
+    print(SingletonDatabase.instanceCount)
+    
+    let singleton2 = SingletonDatabase.instance
+    print(SingletonDatabase.instanceCount)
+ 
+}
+```
+
+Output in the Xcode console:
+
+Initialising the singleton
+1
+1
+
+Instance count remains 1 even though we initialised the class more than once. 
+
+Adding the code snippet for another self explanatory example here which would enhance your understanding:
+
+```
+import UIKit
+ 
+class PlayerRating : CustomStringConvertible{
+    private static var _nameOfThePlayer = ""
+    private static var _ratingForThePlayer = 0
+ 
+    var nameOfThePlayer : String{
+        get {return type(of: self)._nameOfThePlayer}
+        set(value) {type(of: self)._nameOfThePlayer = value}
+    }
+ 
+    var ratingForThePlayer : Int{
+        get {return type(of: self)._ratingForThePlayer}
+        set(value) {type(of: self)._ratingForThePlayer = value}
+    }
+ 
+    var description: String{
+        return "\(nameOfThePlayer) has got a rating of \(ratingForThePlayer)"
+    }
+}
+ 
+func main(){
+    let playerRating1 = PlayerRating()
+    playerRating1.nameOfThePlayer = "Dhoni"
+    playerRating1.ratingForThePlayer = 8
+ 
+    let playerRating2 = PlayerRating()
+    playerRating2.ratingForThePlayer = 7
+ 
+    print(playerRating1)
+    print(playerRating2)
+}
+main()
+ 
+```
+
+Output in the Xcode console:
+ 
+Dhoni has got a rating of 7
+Dhoni has got a rating of 7
+
+Summary:
+ 
+We should use Singleton pattern only when we have a scenario forcing us to use a single instance of an object at multiple places. 
+
     
     
