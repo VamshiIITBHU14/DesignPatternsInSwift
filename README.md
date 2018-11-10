@@ -1734,4 +1734,115 @@ Summary:
  
 When you are in a situation where you have an object that should be able to do the same task but in lots of different ways and you do not want to expose algorithm's implementation details to other classes, opt for Adapter design pattern.
  
+  
+**11) Structural - Bridge Design Pattern:**
+
+Definition:
+Bridge is a structural design pattern which lets us connect components together through abstraction.It enables the separation of implementation hierarchy from interface hierarchy and improves the extensibility.
+Usage:
+Let us suppose that we have a protocol named Batsman whose main function is to make runs for his team.
+
+```
+import Foundation
+import UIKit
+ 
+protocol Batsman
+{
+    func makeRuns(_ numberOfBalls: Int)
+}
+```
+
+makeRuns takes a parameter named numberOfBalls of type Int. 
+Let us now define three different classes of batsmen conforming to Batsman protocol.
+
+```
+class TestBatsman : Batsman
+{
+    func makeRuns(_ numberOfBalls: Int) {
+        print("I am a Test Batsman and I score \(0.6 * Double(numberOfBalls)) runs in \(numberOfBalls) balls")
+    }
+}
+ 
+class ODIBatsman : Batsman
+{
+    func makeRuns(_ numberOfBalls: Int) {
+        print("I am a ODI Batsman and I score \(1 * Double(numberOfBalls)) runs in \(numberOfBalls) balls")
+    }
+}
+ 
+class T20IBatsman : Batsman
+{
+    func makeRuns(_ numberOfBalls: Int) {
+        print("I am a T20 Batsman and I score \(1.4 * Double(numberOfBalls)) runs in \(numberOfBalls) balls")
+    }
+}
+
+```
+
+We have three types of batsmen with the only difference between them being the number of runs they score in a given number of balls.
+
+Let us now define a protocol Player whose main function is to play.
+
+```
+protocol Player
+{
+    func play()
+}
+```
+We now define a Cricketer class conforming to Player protocol.
+```
+class Cricketer : Player
+{
+    var numberOfBalls: Int
+    var batsman: Batsman
     
+    init(_ batsman: Batsman, _ numberOfBalls: Int)
+    {
+        self.batsman = batsman
+        self.numberOfBalls = numberOfBalls
+    }
+    
+    func play() {
+        batsman.makeRuns(numberOfBalls)
+    }
+   
+}
+```
+
+Cricketer class takes two parameters, one of type Batsman and the other of type Int during its initialisation. This is where we are bridging between Batsman class and Player class by calling makeRuns method of batsman in the play method.
+
+Let us now define our main function and see how this design pattern works.
+
+```
+func main()
+{
+    let testBatsman = TestBatsman()
+    let odiBatsman = ODIBatsman()
+    let t20Batsman = T20IBatsman()
+    
+    let cricketer1 = Cricketer(testBatsman, 20)
+    let cricketer2 = Cricketer(odiBatsman, 20)
+    let cricketer3 = Cricketer(t20Batsman, 20)
+    
+    cricketer1.play()
+    cricketer2.play()
+    cricketer3.play()
+    
+}
+ 
+main()
+```
+
+Output in the Xcode console:
+
+I am a Test Batsman and I score 12.0 runs in 20 balls
+I am a ODI Batsman and I score 20.0 runs in 20 balls
+I am a T20 Batsman and I score 28.0 runs in 20 balls
+
+Summary:
+
+When you are in a situation where you have to change the implementation object inside the abstraction and when you need to extend a class in several independent dimensions, Bridge design pattern serves the best.
+
+ 
+
+
