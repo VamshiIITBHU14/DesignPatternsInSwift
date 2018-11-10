@@ -12,7 +12,7 @@ I believe that’s how coding is learned. Happy learning!
 
 There are 28 design patterns divided into SOLID, Creational, Structural, Behavioral categories. You can take code from each of the swift files and run in Xcode playground to see the output.
 
-**1)SOLID - Open Closed Principle**
+**1) SOLID - Open Closed Principle**
 
 Definition:
 
@@ -49,3 +49,70 @@ class TeamRegister : CustomStringConvertible{
     }
 }
 ```
+
+TeamRegister class conforms to CustomStringConvertible. It has two variables defined, an array named teamMembers of type String and memberCount of type Integer.
+
+We also define two methods. checkInGuest method takes the guest name as parameter of type String and appends the guest to teamMembers array and returns array count.
+
+checkOutGuest takes index of type Integer as parameter and removes the guest from register.
+
+```
+class TeamConveyance {
+    
+    func takePlayersToStadium(_ teamRegister : TeamRegister){
+        print("Taking players \n \(teamRegister.description) \n to the Stadium")
+    }
+    
+    func dropPlayersBackAtHotel(){
+        print("Dropping all the players back at Hotel")
+    } 
+}
+```
+
+TeamConveyance class has two responsibilites majorly. takePlayersToStadium takes paramter of type TeamRegister and drops all the players at the stadium. dropPlayersBackAtHotel gets back all the players to hotel after the match is over. It is not concerned about anything else.
+
+Let us now write a function called main and see the code in action:
+
+```
+func main(){
+    let teamRegister = TeamRegister()
+    let player1 = teamRegister.checkInGuest("PlayerOne")
+    let player2 = teamRegister.checkInGuest("PlayerTwo")
+    
+    print(teamRegister)
+}
+ 
+main()
+```
+
+We take an instance of TeamRegister class and check-in few guests passing their names as parameters.
+ 
+Output in the Xcode console:
+ 
+1 - PlayerOne
+2 - PlayerTwo
+
+Let us now check-out a guest and add one more guest to the team. Change the main function to :
+
+```
+func main(){
+    let teamRegister = TeamRegister()
+    let player1 = teamRegister.checkInGuest("PlayerOne")
+    let player2 = teamRegister.checkInGuest("PlayerTwo")
+    
+    print(teamRegister)
+    
+    teamRegister.checkOutGuest(1)
+    print("------------------------------------")
+    print(teamRegister)
+    
+    let player3 = teamRegister.checkInGuest("PlayerThree")
+ 
+    print("------------------------------------")
+    print(teamRegister)
+}
+ 
+main()
+```
+
+
