@@ -12,7 +12,7 @@ I believe that’s how coding is learned. Happy learning!
 
 There are **28 design patterns** divided into **SOLID, Creational, Structural, Behavioral** categories. You can take code from each of the swift files and run in Xcode playground to see the output.
 
-**1) SOLID - Open Closed Principle**
+**1) SOLID - Open Closed Principle : **
 
 Definition:
 
@@ -176,7 +176,7 @@ Taking players
 -------Match Over ----------
 Dropping all the players back at Hotel
 
-**2) SOLID - Single Responsibility Principle**
+**2) SOLID - Single Responsibility Principle : **
 
 Definition:
 
