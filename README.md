@@ -953,3 +953,139 @@ Output in the Xcode console:
 Brett Lee has a wicket of Sachin
 Brett Lee has a wicket of Dhoni
 Brett Lee has a wicket of Dravid
+
+**6) Creational - Factories Design Pattern:**
+
+Definition:
+
+Factory Method Pattern is also known as Virtual Constructor. It is a creational design pattern that defines an abstract class for creating objects in super class but allows the subclasses decide which class to instantiate.
+
+Usage:
+
+Assume there is a BowlingMachine which delivers Red Cricket Balls (used for Test Cricket) and White Crikcet Balls (used for Limited Overs Cricket) based on user input.
+
+```
+import UIKit
+ 
+protocol CricketBall{
+    func hitMe()
+}
+
+Any class conforming to CricketBall must implement hitMe method.
+
+class RedBall : CricketBall{
+    func hitMe() {
+        print("This ball is good for Test Cricket")
+    }
+}
+ 
+class WhiteBall : CricketBall{
+    func hitMe() {
+        print("This ball is good for Limited Overs Cricket")
+    }
+}
+
+```
+
+Let us start defining factories now.
+
+```
+protocol CricketBallFactory{
+ 
+    init()
+    func deliverTheBall (_ speed : Int) -> CricketBall
+}
+```
+Factories conforming to CricketBallFactory must implement deliverTheBall. We should also give some input like the speed at which we want the ball to be delivered.
+
+Now, moving out of abstract classes creating objects, we start defining subclasses for object creation.
+
+```
+class RedBallFactory{
+    func deliverTheBall (_ speed : Int) -> CricketBall{
+          print("Releasing Red Ball at \(speed) speed")
+          return RedBall()
+    }
+}
+ 
+class WhiteBallFactory{
+    func deliverTheBall (_ speed : Int) -> CricketBall{
+        print("Releasing White Ball at \(speed) speed")
+        return WhiteBall()
+    }
+}
+```
+Here we are defining two factories to deliver different colours of balls. We input the speed of the ball and get a red/ white ball in return.
+
+It’s time we go to the machine and give an input to deliver the balls.
+
+```
+class BowlingMachine{
+    enum AvailableBall : String{ 
+        case redBall = "RedBall"
+        case whiteBall = "WhiteBall"
+        
+        static let all = [redBall, whiteBall]
+    }
+    
+    internal var factories = [AvailableBall : CricketBallFactory]()
+    internal var namedFactories = [(String, CricketBallFactory)] ()
+    
+    init() {
+        for ball in AvailableBall.all{
+            let type = NSClassFromString("FactoryDesignPattern.\(ball.rawValue)Factory")
+            let factory = (type as! CricketBallFactory.Type).init()
+            factories[ball] = factory
+            namedFactories.append((ball.rawValue, factory))
+        }
+    }
+    
+    func setTheBall () -> CricketBall{
+        for i in 0..<namedFactories.count{
+            let tuple = namedFactories[i]
+            print("\(i) : \(tuple.0)")
+        }
+        
+        let input = Int(readLine()!)!
+        return namedFactories[input].1.deliverTheBall(120)
+        
+    }
+}
+```
+We define a class called BowlingMachine. We have an enum of available balls with redBall and whiteBall as the options. Then we have an array of all the available balls.
+ 
+We have an internal variable called factories which is a dictionary with key as the AvailableDrink and value as CricketBallFactory. Then we define a variable called namedFactories which is a list of tuples where each entry has the name of the factory and the instance of the factory.
+
+In the initialiser method, we initialise the factory. For each ball in available balls, we get the type from actual class. Then we construct the factory by taking the type and casting it as a CricketBallFactory and initialising it. Then we append each factory to the array of factories.
+ 
+We then define a function which asks us to set the ball and returns a cricket ball. For each factory , we print out the index and the name of the factory. Then based on the input entered by the user, we return cricketBall at given speed.
+ 
+Let’s now define a function called main and see the code in action.
+
+```
+func main(){
+    let bowlingMachine = BowlingMachine()
+    print(bowlingMachine.namedFactories.count)
+    let ball = bowlingMachine.setTheBall()
+    ball.hitMe()
+}
+ 
+main()
+```
+
+Here we initialise the BowlingMachine and set the ball. Then we call the hitMe method on the instance of each ball the user inputs.
+
+Output in the Xcode console:
+ 
+2
+AvailableBalls
+0 : RedBall
+1: WhiteBall
+ 
+If we choose 0, we print ‘Releasing Red Ball at 20 speed’.
+If we choose 1, we print ‘Releasing White Ball at 20 speed’. 
+ 
+Summary:
+ 
+When you are in a situation where a class does not know what subclasses will be required to create or when a class wants its subclasses specify the objects to be created, go for Factory design pattern.
+
