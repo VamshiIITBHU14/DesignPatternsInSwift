@@ -117,16 +117,17 @@ main()
 
 We checked-out ‘PlayerTwo’ and then checked-in another guest named ‘PlayerThree’.
  
+ 
 Output in the Xcode console:
  
 1 - PlayerOne
 2 - PlayerTwo
 
-------------------------------------
 1 - PlayerOne
-------------------------------------
+
 1 - PlayerOne
 3 - PlayerThree
+
 
 Now change the main method to following:
  
@@ -164,18 +165,20 @@ Output in the Xcode console:
  
 1 - PlayerOne
 2 - PlayerTwo
-------------------------------------
+
 1 - PlayerOne
-------------------------------------
+
 1 - PlayerOne
 3 - PlayerThree
-------------------------------------
+
 Taking players 
  1 - PlayerOne
 3 - PlayerThree 
  to the Stadium
+
 -------Match Over ----------
 Dropping all the players back at Hotel
+
 
 **2) SOLID - Single Responsibility Principle : **
 
