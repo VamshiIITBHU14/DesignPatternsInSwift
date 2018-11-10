@@ -2268,3 +2268,243 @@ Summary:
  
 When you want to provide simple interface to a complex sub-system and have a single interface for traversing different data structures, Facade design patterns works the best.
 
+**15) Structural - FlyWeight Design Pattern:**
+
+Definition:
+
+FlyWeight is a structural design pattern that helps in avoiding redundancy while storing data. It helps fitting more objects in the available amount of RAM by reusing already existing similar kind of objects by storing them and creating a new object when no matching object is found.
+
+Assume you are storing first and last names of persons in memory. When there are many people with identical first/ last names, there is no point storing them again and again as a new entity. Instead we use something like FlyWeight design pattern to save the storage space.
+
+Usage:
+
+Let us consider a situation where we are storing player profiles where each entity consists of player’s name of type String and the teams he played for of type String array as attributes. 
+
+We write the code without using FlyWeight design pattern and check the memory occupied.
+
+```
+import UIKit
+import Foundation
+ 
+class PlayerProfile{
+    var fullName : String
+    var teamsPlayedFor : [String]
+    
+    init(_ fullName : String, _ teamsPlayedFor : [String]) {
+        self.fullName = fullName
+        self.teamsPlayedFor = teamsPlayedFor
+    }
+    
+    var charCount: Int
+    {
+        var count = 0
+        for team in teamsPlayedFor{
+            count += team.utf8.count
+        }
+        count += fullName.utf8.count
+        return count
+    }
+}
+```
+
+We define a class called PlayerProfile which takes fullName of type String and teamsPlayedFor of type String array as parameters during its initialisation.
+
+We then define a variable called charCount which is indicator of the memory occupied. Let us write our main function anc check the character count.
+
+```
+func main()
+{
+    let dhoni = PlayerProfile("Mahendra Dhoni",["India ,Chennai"])
+    let kohli = PlayerProfile("Virat Kohli",["India , Bangalore"])
+    let yuvi = PlayerProfile("Yuvraj Singh",["India , Punjab"])
+    print("Total number of chars used:"  ,dhoni.charCount + kohli.charCount + yuvi.charCount)
+    
+}
+ 
+main()
+```
+We define few instances of PlayerProfile by passing the players’ names and their teams as parameters. Then we use the charCount property on all the instances and print it to the console.
+
+
+Output in the Xcode console:
+
+Total number of chars used: 82
+
+Let us now use FlyWeight design pattern for the same use case.
+
+```
+class PlayerProfileOptimised{
+    static var stringsArray = [String]()
+    private var genericNames = [Int]()
+    
+    init(_ fullName: String, _ teamsPlayedFor : [String])
+    {
+        func getOrAdd(_ s: String) -> Int
+        {
+            if let idx = type(of: self).stringsArray.index(of: s)
+            {
+                return idx
+            }
+            else
+            {
+                type(of: self).stringsArray.append(s)
+                return type(of: self).stringsArray.count - 1
+            }
+        }
+        genericNames = fullName.components(separatedBy: " ").map { getOrAdd($0) }
+        for team in teamsPlayedFor{
+            genericNames = team.components(separatedBy: " ").map {getOrAdd($0) }
+        }
+    }
+    
+    static var charCount: Int
+    {
+        return stringsArray.map{ $0.utf8.count }.reduce(0, +)
+    }
+}
+
+```
+
+We define a class called PlayerProfileOptimised. Here we define a static variable called as stringsArray which stores different strings that may or may not be repeated. We then define a non-static variable called as genericNames which is going to keep an array of indices into this array.
+
+In initialisation method, we have an inner function called getOrAdd which takes a string as a parameter and returns the index of the string in stringsArray if already existing, or return the index by adding it to the stringsArray array at the tail end.
+
+We then initialise the genericNames array by taking the full name and split it into component separated by space and mapping it by calling the function getOrAdd with a parameter. This lets us get genericNames to be initialised to a set of indices which corresponds to the strings inside the stringsArray array.
+
+Let us now write main function and check the character count:
+
+```
+func main()
+{
+    let dhoni1 = PlayerProfileOptimised("Mahendra Dhoni",["India ,Chennai"])
+    let kohli1 = PlayerProfileOptimised("Virat Kohli",["India , Bangalore"])
+    let yuvi1 = PlayerProfileOptimised("Yuvraj Singh",["India , Punjab"])
+    print("Total number of chars used:"  ,PlayerProfileOptimised.charCount)
+}
+ 
+main()
+```
+Output in the Xcode console:
+ 
+Total number of chars used: 63
+ 
+For the same data, the number of characters reduced significantly. That’s how FlyWeight design pattern can be used for efficient storage of data.
+ 
+Summary:
+ 
+When you are in a situation to store data that might contain significant amount of duplicate data, you can use FlyWeight design pattern. This helps in reduction in the usage of available RAM.
+
+**16) Structural - Proxy Design Pattern:**
+
+Definition:
+
+Talking in terms of real world, your debit card is a proxy of your bank account. It’s not real money but can be substituted for money when you want to buy something.
+
+Proxy is a structural design pattern which uses wrapper classes to create a stand-in for a real resource. It is also called surrogate, handle and wrapper. Proxy is used to cover the main object’s complex logic from the client using it.
+
+Usage:
+
+Assume we are designing a small software to filter applicants for the position of head coach of a cricket team. The client only passes the number of years of experience of the applicant and we need to write a logic without disturbing the client to say if the applicant is fit for the role or not.
+
+Let us see how we can use Proxy design pattern here:
+
+```
+import UIKit
+import Foundation
+ 
+protocol Coach
+{
+    func mentorTheTeam()
+}
+ 
+class CricketCoach : Coach
+{
+    
+    func mentorTheTeam() {
+        print("Mentoring the Cricket Team")
+    }
+   
+}
+```
+
+We define a protocol called Coach whose main job is to mentor the team.
+Then we define a class called CricketCoach conforming to Coach protocol. 
+
+```
+class CoachApplicant
+{
+    var numberOfYearsOfExperience: Int
+    
+    init(numberOfYearsOfExperience: Int)
+    {
+        self.numberOfYearsOfExperience = numberOfYearsOfExperience
+    }
+}
+```
+
+We write a class called CoachApplicant which takes numberOfYearsOfExperience of type Int as parameter during its initialisation.
+ 
+Now we write a proxy conforming to Coach protocol to define the logic to filter applicants.
+
+```
+class CricketCoachProxy : Coach
+{
+    private let cricketCoach = CricketCoach()
+    private let coachApplicant: CoachApplicant
+    
+    init(coachApplicant: CoachApplicant)
+    {
+        self.coachApplicant = coachApplicant
+    }
+    
+    func mentorTheTeam() {
+        if coachApplicant.numberOfYearsOfExperience >= 8{
+            cricketCoach.mentorTheTeam()
+        } else{
+            print("Not enough experience to coach the team")
+        }
+    }
+   
+}
+```
+
+It has got two private variables, one of type CricketCoach and one of type CoachApplicant. In mentorTheTeam method, we define the logic. If the experience of coach applicant is more than 8 years, he is through, else he is rejected.
+
+Let us now write our main method:
+ 
+ ```
+func main()
+{
+    let coach : Coach = CricketCoachProxy(coachApplicant: CoachApplicant(numberOfYearsOfExperience: 8))
+    coach.mentorTheTeam()
+}
+ 
+main()
+```
+ 
+Output in the Xcode console:
+ 
+Mentoring the Cricket Team
+
+Keep changing the experience parameter and check the output.
+ 
+```func main()
+{
+    let coach : Coach = CricketCoachProxy(coachApplicant: CoachApplicant(numberOfYearsOfExperience: 5))
+    coach.mentorTheTeam()
+}
+ 
+main()
+```
+ 
+Output in the Xcode console:
+
+Not enough experience to coach the team
+ 
+In future, if we want to change the criteria from 8 years to 10 years or 6 years, we do not have to change any code at client’s end. We can just change the logic in the proxy and things will work just good.
+ 
+Summary:
+ 
+When you want to create a wrapper around main object to hide its complexity from client, Proxy design pattern suits the best. It also helps in delaying the object’s initialisation so that you can load the objects only when it is needed.
+
+
