@@ -115,4 +115,64 @@ func main(){
 main()
 ```
 
+We checked-out ‘PlayerTwo’ and then checked-in another guest named ‘PlayerThree’.
+ 
+Output in the Xcode console:
+ 
+1 - PlayerOne
+2 - PlayerTwo
+------------------------------------
+1 - PlayerOne
+------------------------------------
+1 - PlayerOne
+3 - PlayerThree
+
+Now change the main method to following:
+ 
+```
+func main(){
+    let teamRegister = TeamRegister()
+    let player1 = teamRegister.checkInGuest("PlayerOne")
+    let player2 = teamRegister.checkInGuest("PlayerTwo")
+    
+    print(teamRegister)
+    
+    teamRegister.checkOutGuest(1)
+    print("------------------------------------")
+    print(teamRegister)
+    
+    let player3 = teamRegister.checkInGuest("PlayerThree")
+ 
+    print("------------------------------------")
+    print(teamRegister)
+    
+    print("------------------------------------")
+    let teamBus = TeamConveyance()
+    teamBus.takePlayersToStadium(teamRegister)
+    
+    print("-------Match Over ----------")
+    teamBus.dropPlayersBackAtHotel()
+}
+ 
+main()
+```
+
+We are taking an instance of TeamConveyance to drop players at stadium and get them back at hotel after the match is over.
+ 
+Output in the Xcode console:
+ 
+1 - PlayerOne
+2 - PlayerTwo
+------------------------------------
+1 - PlayerOne
+------------------------------------
+1 - PlayerOne
+3 - PlayerThree
+------------------------------------
+Taking players 
+ 1 - PlayerOne
+3 - PlayerThree 
+ to the Stadium
+-------Match Over ----------
+Dropping all the players back at Hotel
 
