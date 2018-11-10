@@ -10,7 +10,7 @@ I would suggest you code the examples (not copy-paste, but type each and every l
 scenario where you would apply such a design pattern, and code an example for yourself.
 I believe that’s how coding is learned. Happy learning!
 
-There are 28 design patterns divided into SOLID, Creational, Structural, Behavioral categories. You can take code from each of the swift files and run in Xcode playground to see the output.
+There are **28 design patterns** divided into **SOLID, Creational, Structural, Behavioral** categories. You can take code from each of the swift files and run in Xcode playground to see the output.
 
 **1) SOLID - Open Closed Principle**
 
