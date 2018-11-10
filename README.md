@@ -121,6 +121,7 @@ Output in the Xcode console:
  
 1 - PlayerOne
 2 - PlayerTwo
+
 ------------------------------------
 1 - PlayerOne
 ------------------------------------
@@ -491,5 +492,107 @@ Output in the Xcode console:
  Symonds belongs to Australia Team and is an Allrounder
  
 We can write n number of filters without modifying any existing classes but by just extending the Filter class. 
+
+**3) SOLID - Liskov Substitution Principle (LSP):**
+
+Definition: 
+
+Liskov substitution principle named after Barbara Liskov states that one should always be able to substitute a base type for a subtype. LSP is a way of ensuring that inheritance is used correctly. If a module is using a base class, then the reference to the base class can be replaced with a derived class without affecting the functionality of the module.
+
+Usage:
+
+Let us understand LSP’s usage with a simple example. 
+
+```
+import UIKit
+import Foundation
+ 
+protocol Cricketer {
+    func canBat()
+    func canBowl()
+    func canField()
+}
+```
+
+We define a protocol called Cricketer which implements three methods of canBat, canBowl, canField.
+
+```
+class AllRounder : Cricketer{
+    func canBat() {
+        print("I can bat")
+    }
+    
+    func canBowl() {
+        print("I can bowl")
+    }
+    
+    func canField() {
+        print("I can field")
+    }
+}
+```
+We then define a class called AllRounder conforming to Cricketer protocol. An all-rounder in cricket is someone who can bat, bowl and field.
+
+```
+class Batsman : Cricketer{
+    func canBat() {
+        print("I can bat")
+    }
+    
+    func canBowl() {
+        print("I cannot bowl")
+    }
+    
+    func canField() {
+        print("I can field")
+    }
+}
+
+```
+
+We then define a class called Batsman conforming to Cricketer protocol. This is violation of LSP as a batsman is a cricketer but cannot use Cricketer protocol because he cannot bowl. Let us now see how we can use LSP in this scenario:
+
+```
+protocol Cricketer {
+    func canBat()
+    func canField()
+}
+ 
+class Batsman : Cricketer{
+    func canBat() {
+        print("I can bat")
+    }
+    
+    func canField() {
+        print("I can field")
+    }
+}
+```
+We change the Cricketer protocol and now make the Batsman class conform to Cricketer protocol.
+
+```
+class BatsmanWhoCanBowl : Cricketer{
+ 
+    func canBat() {
+        print("I can bat")
+    }
+    
+    func canField() {
+        print("I can field")
+    }
+    
+    func canBowl() {
+        print("I can bowl")
+    }
+ 
+}
+ 
+class AllRounder : BatsmanWhoCanBowl{
+    
+}
+
+```
+
+We then define a new class named BatsmanWhoCanBowl with super class as Cricketer and define the extra method of  canBowl in this class.
 
 
