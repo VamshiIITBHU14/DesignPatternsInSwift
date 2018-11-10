@@ -1645,5 +1645,93 @@ Summary:
  
 We should use Singleton pattern only when we have a scenario forcing us to use a single instance of an object at multiple places. 
 
+
+**10) Structural - Adapter Design Pattern:**
+Definition:
+ 
+Adapter is a structural design pattern converts the interface of a class into another interface clients expect. This lets classes with incompatible interfaces to collaborate.
+ 
+Usage:
+
+Suppose you have a TestBatsman class with fieldWell() and makeRuns()methods. And also a T20Batsman class with batAggressively() method.
+
+Let’s assume that you are short on T20Batsman objects and you would like to use TestBatsman objects in their place. TestBatsmen have some similar functionality but implement a different interface (they can bat but cannot bat in the way needed for a T20 match), so we can’t use them directly. 
+
+So we will use adapter pattern. Here our client would be T20Batsman and adaptee would be TestBatsman. 
+
+Let us now write code:
+
+```
+import UIKit
+ 
+protocol TestBatsman {
+    func makeRuns()
+    func fieldWell()
+}
+```
+
+A simple protocol named TestBatsman defining two methods, makeRuns and fieldWell.
+
+```
+class Batsman1 : TestBatsman{
+    func makeRuns() {
+        print("I can bat well but only at StrikeRate of 80")
+    }
     
+    func fieldWell() {
+        print("I can field well")
+    }
+}
+```
+
+We define a Batsman1 class conforming to TestBatsman protocol. This type of batsman can make runs at a strike rate of 80.
+```
+protocol T20Batsman{
+    func batAggressively()
+}
+```
+
+We have one more protocol named T20Batsman which defines batAggressively method.
+```
+class Batsman2 : T20Batsman{
+    func batAggressively() {
+         print("I need to bat well at a StrikeRate of more than 130")
+    }
+}
+```
+
+We define a Batsman2 class conforming to T20Batsman protocol. This type of batsman can make runs at a strike rate of 130.
+ 
+Now considering our situation, we need to make an adapter in such a way that TestBatsman can fit to be a T20Batsman.
+
+```
+class TestBatsmanAdapter : T20Batsman{
+    let testBatsman : TestBatsman
+    init (_ testBatsman : TestBatsman){
+        self.testBatsman = testBatsman
+    }
+    
+    func batAggressively() {
+        testBatsman.makeRuns()
+    }
+}
+```
+ 
+We write a class named TestBatsmanAdapter whose superclass is T20Batsman. It has a property of type TestBatsman and it takes an object of type TestBatsman for its initialisation. It is this object which we make adaptable to batAggressively method by calling makeRuns method.
+ 
+ 
+Output in the Xcode console:
+ 
+Test Batsman
+I can field well
+I can bat well but only at StrikeRate of 80
+T20 Batsman
+I need to bat well at a StrikeRate of more than 130
+TestBatsmanAdapter
+I can bat well but only at StrikeRate of 80
+ 
+Summary:
+ 
+When you are in a situation where you have an object that should be able to do the same task but in lots of different ways and you do not want to expose algorithm's implementation details to other classes, opt for Adapter design pattern.
+ 
     
