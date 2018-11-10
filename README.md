@@ -1297,3 +1297,192 @@ If you are trying to use the same code for building different products to isolat
 
 Also be careful that when your product does not require multiple parameters for initialisation or construction, it’s advised to stay away from Builder pattern.
 
+**8) Creational - Prototype Design Pattern:**
+
+Definition:
+
+Prototype is a creational design pattern used in situations which lets us produce new objects, that are almost similar state or differs little. A prototype is basically a template of any object before the actual object is constructed. The Prototype pattern delegates cloning process to objects themselves.
+
+Usage:
+
+Let us consider a simple use case where we want to create the profile of two cricketers which includes their name, and a custom profile which includes runs scored and wickets taken. 
+
+```
+import UIKit
+ 
+class Profile : CustomStringConvertible{
+    var runsScored : Int
+    var wicketsTaken : Int
+    
+    init(_ runsScored : Int, _ wicketsTaken : Int) {
+        self.runsScored = runsScored
+        self.wicketsTaken = wicketsTaken
+    }
+    
+    var description: String{
+        return "\(runsScored) Runs Scored & \(wicketsTaken) Wickets Taken"
+    }
+}
+
+```
+
+First, we create a Profile class which conforms to CustomStringConvertible. It has two properties runsScored and wicketsTaken of type int. It takes the same parameters during its initialisation.
+
+Then we define a Cricketer class conforms to CustomStringConvertible. It has two properties, name of type String and profile of custom type Profile which we just created.
+
+```
+class Cricketer : CustomStringConvertible {
+    var name : String
+    var profile : Profile
+    
+    init(_ name :String , _ profile : Profile) {
+        self.name = name
+        self.profile = profile
+    }
+    var description: String{
+        return "\(name) : Profile : \(profile)"
+    }
+    
+}
+```
+
+Let us now write a function called main to see the things in action.
+
+```
+func main (){
+    let profile = Profile(1200, 123)
+    let bhuvi = Cricketer("Bhuvi", profile)
+    print(bhuvi.description)
+}
+ 
+main()
+```
+
+It prints 
+
+Bhuvi : Profile : 1200 Runs Scored & 123 Wickets Taken in the Xcode console.
+
+Now we need to talk about copying the objects.
+
+Just before print statement in the main function, add the following lines .
+
+```
+var ishant = bhuvi
+ishant.name = "Ishant"
+print(ishant.description)
+ ```
+ It prints
+Ishant : Profile : 1200 Runs Scored & 123 Wickets Taken
+Ishant : Profile : 1200 Runs Scored & 123 Wickets Taken
+ 
+in the Xcode console.
+ 
+This is because we are only copying the references. 
+ 
+Now add this line just before printing ishant’s description.
+
+```ishant.profile.runsScored = 600```
+
+It prints
+Ishant : Profile : 600 Runs Scored & 123 Wickets Taken
+Ishant : Profile : 600 Runs Scored & 123 Wickets Taken
+ 
+in the Xcode console.
+ 
+Now, we need to make sure bhuvi and ishant actually refer to different objects. 
+ 
+Here, we use the concept of Deep Copy. When we deep copy objects, the system will copy references and each copied reference will be pointing to its own copied memory object. Let us now see how to implement Deep Copy interface for our use case.
+
+```
+protocol DeepCopy{
+    func createDeepCopy () -> Self
+}
+
+```
+
+First, we create a DeepCopy protocol which defines a function called createDeepCopy returning self.
+ 
+Then make the classes Profile and Cricketer conform to DeepCopy protocol. Classes now look like:
+
+```
+class Profile : CustomStringConvertible, DeepCopy{
+    var runsScored : Int
+    var wicketsTaken : Int
+    
+    init(_ runsScored : Int, _ wicketsTaken : Int) {
+        self.runsScored = runsScored
+        self.wicketsTaken = wicketsTaken
+    }
+    
+    var description: String{
+        return "\(runsScored) Runs Scored & \(wicketsTaken) Wickets Taken"
+    }
+    
+    func createDeepCopy() -> Self {
+        return deepCopyImplementation()
+    }
+    
+    private func deepCopyImplementation <T> () -> T{
+        return Profile(runsScored, wicketsTaken) as! T
+    }
+}
+```
+
+We have a private method called deepCopyImplementation which is generic and and able to figure out the type correctly. It has a type parameter ‘T’ which is actually going to be inferred (we don’t provide this type parameter anywhere) and a return type of ‘T’. We return a Profile objects and force cast it to T.
+ 
+Cricketer class now looks like:
+
+```
+class Cricketer : CustomStringConvertible ,DeepCopy{
+    var name : String
+    var profile : Profile
+    
+    init(_ name :String , _ profile : Profile) {
+        self.name = name
+        self.profile = profile
+    }
+    
+    var description: String{
+        return "\(name) : Profile : \(profile)"
+    }
+    
+    func createDeepCopy() -> Self {
+        return deepCopyImplementation()
+    }
+    
+    private func deepCopyImplementation <T> () -> T{
+        return Cricketer(name, profile) as! T
+    }
+    
+}
+```
+Let us define our main method as below and see the results:
+
+```
+func main(){
+    let profile = Profile(1200, 123)
+    let bhuvi = Cricketer("Bhuvi", profile)
+    let ishant = bhuvi.createDeepCopy()
+    ishant.name = "Ishant"
+    ishant.profile = bhuvi.profile.createDeepCopy()
+    ishant.profile.wicketsTaken = 140
+    print(bhuvi.description)
+    print(ishant.description)
+}
+ 
+main()
+```
+
+Output in the Xcode console:
+ 
+Bhuvi : Profile : 1200 Runs Scored & 123 Wickets Taken
+Ishant : Profile : 1200 Runs Scored & 140 Wickets Taken
+ 
+We can see that bhuvi and ishant are two different objects now and this is how deep copy is implemented.
+ 
+Summary:
+ 
+When you are in a situation to clone objects without coupling to their concrete classes, you can opt for Prototype design pattern which also helps in reducing repetitive initialization code.
+
+    
+    
