@@ -4047,3 +4047,203 @@ Summary:
  
 When you are in a situation to build a template/ base class which is open for extension but closed for modification, or in simple words, subclasses should be able to extend the base algorithm without altering its structure, Template design patterns suits the best.
 
+**28) Behavioral - Visitor Design Pattern:**
+
+Definition:
+ 
+Visitor is a behavioral design pattern that lets us define a new operation without changing the classes of the objects on which it operates. We use it when we do not want to keep modifying every class in the hierarchy.
+
+Usage:
+
+Consider a situation where we are designing a checkout counter in a shop that sells cricket accessories. It offers discount on selective brands and selective items. Let us see how we can use Visitor pattern to design such system.
+
+```
+import Foundation
+import UIKit
+ 
+protocol CricketAccessory{
+    func accept(counter : CheckoutCounter) -> Int
+}
+```
+
+We define a protocol called CricketAccessory with a function called accept which takes a parameter of type CheckoutCounter ( to be defined) and returns an integer.
+
+```
+class CricketBat : CricketAccessory{
+    private var price : Double
+    private var brand : String
+    
+    init(_ price : Double, _ brand:String) {
+        self.price = price
+        self.brand = brand
+    }
+    
+    public func getPrice() -> Double{
+        return price
+    }
+    
+    public func getBrand() -> String{
+        return brand
+    }
+    func accept(counter : CheckoutCounter) -> Int {
+        return counter.moveToCounter(bat: self)
+    }
+}
+```
+
+We then define a class called CricketBat conforming to CricketAccessory protocol. It has two private variables defined namely, price of type Double and brand of type String. We also two define two public methods called getPrice and getBrand to return price and brand of the bat respectively.
+
+```
+class CricketBall : CricketAccessory{
+ 
+    private var type : String
+    private var price : Double
+ 
+    init(_ type : String, _ price : Double){
+        self.type = type
+        self.price = price
+ 
+    }
+ 
+    public func getType() -> String{
+        return type
+    }
+ 
+    public func getPrice() -> Double{
+        return price
+    }
+ 
+    func accept(counter : CheckoutCounter) -> Int {
+         return counter.moveToCounter(ball: self)
+    }
+ 
+}
+ 
+```
+
+We define another class called CricketBall conforming to CricketAccessory protocol. This is very much similar to CricketBat class.
+ 
+```
+protocol CheckoutCounter {
+    func moveToCounter(bat : CricketBat) -> Int
+    func moveToCounter(ball : CricketBall) -> Int
+}
+ 
+```
+
+We define a protocol called CheckoutCounter which has two methods with the same name but differs when it comes to parameter types.
+
+```
+class CashCounter :CheckoutCounter{
+    func moveToCounter(bat: CricketBat) -> Int {
+        var cost : Int = 0
+        if bat.getBrand() == "MRF"{
+            cost = Int(0.9 * bat.getPrice())
+        } else{
+            cost = Int(bat.getPrice())
+        }
+        print("Bat brand : \(bat.getBrand()) and price is : \(cost) ")
+        return cost
+    }
+ 
+    func moveToCounter(ball: CricketBall) -> Int {
+        
+        print("Ball Type : \(ball.getType()) and price is : \(ball.getPrice()) ")
+        return Int(ball.getPrice())
+    }
+}
+ 
+```
+
+We now define a class called CashCounter conforming to CheckoutCounter. We can see that, for a cricket bat of brand MRF we give a discount of 10%. In future, if we want to add any new brands or remove discount on existing brands, we can make all the changes here with no changes required at the client end.
+Let us now write main function to see the code in action:
+```
+func main(){
+    print("Main")
+    func finalPriceCalculation(accessories : [CricketAccessory]) -> Int{
+        var checkout = CashCounter()
+        var cost = 0
+        for item in accessories{
+            cost += item.accept(counter: checkout)
+        }
+        print("Total cart value : \(cost)")
+        return cost
+    }
+    
+    var cartItems = [CricketAccessory]()
+    let mrfBat = CricketBat(2000, "MRF")
+    let brittaniaBat = CricketBat(1500, "Brittania")
+    let tennisBall = CricketBall("Tennis", 120)
+    let leatherBall = CricketBall("Leather", 200)
+    cartItems.append(mrfBat)
+    cartItems.append(brittaniaBat)
+    cartItems.append(tennisBall)
+    cartItems.append(leatherBall)
+ 
+    var cost = finalPriceCalculation(accessories: cartItems)
+    print("Checked Out with Bill Amount : \(cost)")
+}
+ 
+main()
+```
+
+We define a function called finalPriceCalculation which takes an array of type CricketAccessory and returns the final cart value. 
+ 
+Output in the Xcode console:
+ 
+Main
+Bat brand : MRF and price is : 1800 
+Bat brand : Brittania and price is : 1500 
+Ball Type : Tennis and price is : 120.0 
+Ball Type : Leather and price is : 200.0 
+Total cart value : 3620
+Checked Out with Bill Amount : 3620
+ 
+You can see MRF bat is checkout at discounted price. 
+ 
+Let us now change the CashCounter class to following:
+
+```
+class CashCounter :CheckoutCounter{
+    func moveToCounter(bat: CricketBat) -> Int {
+        var cost : Int = 0
+        if bat.getBrand() == "Brittania"{
+            cost = Int(0.8 * bat.getPrice())
+        } else{
+            cost = Int(bat.getPrice())
+        }
+        print("Bat brand : \(bat.getBrand()) and price is : \(cost) ")
+        return cost
+    }
+ 
+    func moveToCounter(ball: CricketBall) -> Int {
+        
+        print("Ball Type : \(ball.getType()) and price is : \(ball.getPrice()) ")
+        return Int(ball.getPrice())
+    }
+}
+```
+
+Now, we are removing discount on MRF and giving 20% discount on Brittania bats. 
+ 
+The same main method gives a different output in the Xcode console:
+ 
+Main
+Bat brand : MRF and price is : 2000 
+Bat brand : Brittania and price is : 1200 
+Ball Type : Tennis and price is : 120.0 
+Ball Type : Leather and price is : 200.0 
+Total cart value : 3520
+Checked Out with Bill Amount : 3520
+ 
+Summary:
+ 
+When you are in a situation where you might want to add a new action and have that new action entirely defined within one of the visitor classes rather than spread out across multiple classes, Visitor design pattern serves you the best.
+
+**Final Note: **
+
+
+It is not necessary to learn all the patterns and their applications by heart. The main intention is to identify the use-cases and problems which the design patterns are meant to address. Then applying a specific design pattern is just a matter of using right tool at right time for the right job. It's the job that must be identified and understood before the tool can be chosen.
+ 
+Happy Coding!!!
+
