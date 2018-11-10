@@ -2804,3 +2804,292 @@ Summary:
 
 Strategy pattern allows us to define a set of related algorithms and allows client to choose any of the algorithms at runtime. It allows us to add new algorithm without modifying existing algorithms.
 
+**19) Behavioral - Command Design Pattern:**
+
+Definition:
+
+The definition of Command provided in the original Gang of Four book on DesignPatterns states: 
+
+Encapsulate a request as an object, thereby letting you parameterize clients with different requests, queue or log requests, and support undoable operations.
+
+Command is a behavioral design pattern that decouples the object that invokes the operation from the object that knows how to perform it. It lets us turn requests into stand-alone objects by providing request objects with all the necessary information for the action to be taken.
+Usage:
+Let us consider a decision review system in a cricket match where the on-field umpire is not sure if a batsman is out or not. This umpire then asks the TV Umpire to check TV replays and make a decision. The TV umpire then commands the TV operator to show OUT/ NOT OUT on the screen present in the ground depending upon the decision made. 
+
+Let’s see how we can design such system with the help of Command design pattern.
+
+```
+import UIKit
+import Foundation
+ 
+protocol Command{
+    func execute()
+}
+ 
+We define a protocol named Command with a function named execute.
+class ScreenDisplay{
+    private var showOutOnDisplay = false
+    
+    func isBatsmanOut(){
+        showOutOnDisplay = true
+        print("Batsman is OUT")
+    }
+    
+    func isBatsmanNotOut(){
+        showOutOnDisplay = false
+        print("Batsman is NOTOUT")
+    }
+ 
+}
+ 
+```
+
+We then define a class called ScreenDisplay which is used to display the decision made by the TV umpire to public. It has a private variable named showOutOnDisplay which is initialised to false. 
+It has two methods defined. Based on the bool property, these methods show batsman OUT/ NOT OUT on the screen.
+
+```
+class BatsmanOutCommand : Command{
+    var screenDisplay : ScreenDisplay
+    
+    init(_ screenDisplay : ScreenDisplay){
+        self.screenDisplay = screenDisplay
+    }
+    
+    func execute() {
+        screenDisplay.isBatsmanOut()
+    }
+}
+ 
+class BatsmanNotOutCommand : Command{
+    var screenDisplay : ScreenDisplay
+    
+    init(_ screenDisplay : ScreenDisplay){
+        self.screenDisplay = screenDisplay
+    }
+    
+    func execute() {
+        screenDisplay.isBatsmanNotOut()
+    }
+}
+ 
+```
+
+We then write two classes BatsmanOutCommand and BatsmanNotOutCommand conforming to Command protocol. Both these classes take a parameter of type ScreenDisplay during their initialisation. Then we write the definition of execute method by calling isBatsmanOut/ isBatsmanNotOut on ScreenDisplay object.
+
+```
+class DisplaySwitch {
+    var command : Command
+    
+    init(_ command : Command) {
+        self.command = command
+    }
+    
+    func pressSwitch(){
+        command.execute()
+    }
+}
+```
+
+Finally, we write a class called DisplaySwitch which takes an object of type Command for its initialisation. We define a method called pressSwitch which implements the execute method on Command object.
+Let us write our main method and see our code in action.
+
+```
+func main(){
+    let screenDisplay = ScreenDisplay()
+    
+    let outCommand = BatsmanOutCommand(screenDisplay)
+    let notOutCommand = BatsmanNotOutCommand(screenDisplay)
+    
+    let displaySwitchForOut = DisplaySwitch(outCommand)
+    displaySwitchForOut.pressSwitch()
+    
+    let displaySwitchForNotOut = DisplaySwitch(notOutCommand)
+    displaySwitchForNotOut.pressSwitch()
+    
+}
+ 
+main()
+```
+
+We take an instance of ScreenDisplay and pass it to BatsmanOutCommand and BatsmanNotOutCommand for their initialisations. 
+ 
+Then based on the decision made by the TV umpire, we initialise DisplaySwitch using outCommand / notOutCommand as the parameters. 
+ 
+Output in the Xcode console:
+ 
+Batsman is OUT
+Batsman is NOTOUT
+ 
+Summary:
+ 
+When you want to encapsulate the logical details of an operation in a separate entity and define specific instructions for applying the command, Command design pattern serves you the best. It also helps in creating composite commands.
+
+**20) Behavioral - Iterator Design Pattern:**
+
+Definition:
+
+Iteration in coding is a core functionality of various data structures. An iterator facilitates the the traversal of a data structure. Iterator is a behavioral design pattern that is used to sequentially access the elements of an aggregate object without exposing its underlying implementation.
+
+Usage:
+
+Assume we are making a list of top cricketers in current lot which includes their name and team name. We will now see how to use an Iterator to traverse through the list and print the profile of each cricketer.
+
+Let us write some code now:
+
+```
+import Foundation
+struct Cricketer{
+    let name : String
+    let team : String
+}
+```
+
+We define a struct named Cricketer which stores name and team as String properties.
+
+```
+struct Cricketers{
+    let cricketers : [Cricketer]
+}
+```
+
+We define another struct named Cricketers which stores cricketers Array of custom type Cricketer.
+
+```
+struct CricketersIterator : IteratorProtocol{
+    
+    private var current = 0
+    private let cricketers : [Cricketer]
+    
+    init(_ cricketers : [Cricketer]) {
+        self.cricketers = cricketers
+    }
+    
+    mutating func next() -> Cricketer? {
+        defer {
+            current += 1
+        }
+        if cricketers.count > current{
+            return cricketers[current]
+        } else{
+            return nil
+        }
+    }
+    
+}
+
+extension Cricketers : Sequence{
+    func makeIterator() -> CricketersIterator {
+        return CricketersIterator(cricketers)
+    }
+}
+
+```
+
+This is where the magic happens. We define a struct named CricketersIterator conforming to IteratorProtocol. Then we write an extension for Cricketers which conforms to Sequence protocol.
+
+Apple says ,
+
+The IteratorProtocol protocol is tightly linked with the Sequence protocol. Sequences provide access to their elements by creating an iterator, which keeps track of its iteration process and returns one element at a time as it advances through the sequence.
+Whenever you use a for-in loop with an array, set, or any other collection or sequence, you’re using that type’s iterator. Swift uses a sequence’s or collection’s iterator internally to enable the for-in loop language construct.
+Using a sequence’s iterator directly gives you access to the same elements in the same order as iterating over that sequence using a for-in loop.
+
+Back to our code, we defined two private properties current of type Int (with default value of 0) and an array cricketers of type Cricketer. 
+
+We define a method next which returns an object of type Cricketer (notice the optional - we may not have any element left in the array after we reach the last element).
+
+Let us now write our main method:
+
+```
+func main(){
+    let cricketers = Cricketers(cricketers: [Cricketer(name: "Kohli", team: "India"), Cricketer(name: "Steve", team: "Australia"), Cricketer(name: "Kane", team: "Kiwis"), Cricketer(name: "Root", team: "England")])
+    for crick in cricketers{
+        print(crick)
+    }
+}
+ 
+main()
+```
+
+Output in the Xcode console:
+ 
+Cricketer(name: "Kohli", team: "India")
+Cricketer(name: "Steve", team: "Australia")
+Cricketer(name: "Kane", team: "Kiwis")
+Cricketer(name: "Root", team: "England")
+ 
+Adding the code snippet for another self explanatory example here which would enhance your understanding:
+
+```
+import Foundation
+ 
+class Cricketer : Sequence
+{
+    var totalRunsScored = [Int](repeating: 0, count: 3)
+    
+    private let _testRuns = 0
+    private let _ODIRuns = 1
+    private let _t20Runs = 2
+    
+    var testRuns: Int
+    {
+        get { return totalRunsScored[_testRuns] }
+        set(value) { totalRunsScored[_testRuns] = value }
+    }
+    
+    var ODIRuns: Int
+    {
+        get { return totalRunsScored[_ODIRuns] }
+        set(value) { totalRunsScored[_ODIRuns] = value }
+    }
+    
+    var t20Runs: Int
+    {
+        get { return totalRunsScored[_t20Runs] }
+        set(value) { totalRunsScored[_t20Runs] = value }
+    }
+    
+    var totalRuns: Int
+    {
+        return totalRunsScored.reduce(0, +)
+    }
+    
+    subscript(index: Int) -> Int
+    {
+        get { return totalRunsScored[index] }
+        set(value) { totalRunsScored[index] = value }
+    }
+    
+    func makeIterator() -> IndexingIterator<Array<Int>>
+    {
+        return IndexingIterator(_elements: totalRunsScored)
+    }
+}
+ 
+func main()
+{
+    let cricketer = Cricketer()
+    cricketer.testRuns = 1200
+    cricketer.ODIRuns = 1800
+    cricketer.t20Runs = 600
+ 
+    print("Total Runs Scored = \(cricketer.totalRuns)")
+    
+    for s in cricketer
+    {
+        print(s)
+    }
+}
+ 
+main()
+```
+Output in the Xcode console:
+ 
+Total Runs Scored = 3600
+1200
+1800
+600
+ 
+Summary:
+ 
+When you are in a situation where you want to hide the complexity of a data structure from clients and have a single interface for traversing the data structures, iterator design pattern serves you the best.
+
