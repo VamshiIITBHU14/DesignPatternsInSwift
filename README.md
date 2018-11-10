@@ -1089,3 +1089,211 @@ Summary:
  
 When you are in a situation where a class does not know what subclasses will be required to create or when a class wants its subclasses specify the objects to be created, go for Factory design pattern.
 
+**7) Creational - Builder Design Pattern :**
+
+Definition:
+ 
+Builder is a creational design pattern that helps in piecewise construction of  complex objects avoiding too many initializer arguments. It lets us produce different types and representations of an object using the same process of building.
+ 
+This pattern majorly involves three types. 
+ 
+Product - complex object to be created
+Builder - handles the creation of product
+Director - accepts inputs and coordinates with the builder
+ 
+Usage:
+
+Let us assume we are creating a cricket team which consists of a captain, batsmen and bowlers. We will see how we can use builder pattern in this context. 
+
+We start with the Product part first.
+
+```
+import UIKit
+ 
+//MARK: -Product
+public struct CricketTeam{
+    public let captain : Captain
+    public let batsmen : Batsmen
+    public let bowlers : Bowlers
+}
+
+extension CricketTeam : CustomStringConvertible{
+    public var description : String{
+        return "Team with captain \(captain.rawValue)"
+    }
+}
+```
+We first define CricketTeam, which has properties for captain, batsmen and bowlers. Once a team is set, we shouldn’t be able to change its composition. We also make CricketTeam conform to CustomStringConvertible.
+
+```
+public enum Captain : String{
+    case Dhoni
+    case Kohli
+    case Rahane
+}
+```
+We declare Captain as enum. Each team can have only one captain.
+
+```
+public struct Batsmen : OptionSet{
+    public static let topOrderBatsman = Batsmen(rawValue: 1 << 0)
+    public static let middleOrderBatsman = Batsmen(rawValue: 1 << 1)
+    public static let lowerOrderBatsman = Batsmen(rawValue: 1 << 2)
+    
+    public let rawValue : Int
+    public init(rawValue : Int){
+        self.rawValue = rawValue
+    }
+}
+ 
+public struct Bowlers : OptionSet{
+    public static let fastBowler = Bowlers(rawValue: 1 << 0)
+    public static let mediumPaceBowler = Bowlers(rawValue: 1 << 1)
+    public static let spinBowler = Bowlers(rawValue: 1 << 2)
+    
+    public let rawValue : Int
+    public init(rawValue : Int){
+        self.rawValue = rawValue
+    }
+}
+```
+
+We define Batsmen and Bowlers as OptionSet. This allows us to try different combination of batsmen together. Like a team with two topOrderBatsman, one middleOrderBatsman. Same with Bowlers where we can choose a combination of fastBowler, mediumPaceBowler and a spin bowler for the team.
+
+Add the following code to make Builder.
+
+```
+//MARK: -Builder
+public class CricketTeamBuilder{
+    
+    public enum Error:Swift.Error{
+        case alreadyTaken
+    }
+    
+    public private(set) var captain : Captain = .Dhoni
+    public private(set) var batsmen : Batsmen = []
+    public private(set) var bowlers : Bowlers = []
+    private var soldOutCaptains : [Captain] = [.Dhoni]
+    
+    public func addBatsman(_ batsman : Batsmen){
+        batsmen.insert(batsman)
+    }
+    
+    public func removeBatsman(_ batsman: Batsmen) {
+        batsmen.remove(batsman)
+    }
+    
+    public func addBowler(_ bowler : Bowlers){
+        bowlers.insert(bowler)
+    }
+    
+    public func removeBowler(_ bowler: Bowlers) {
+        bowlers.remove(bowler)
+    }
+ 
+    public func pickCaptain(_ captain: Captain) throws {
+        guard isAvailable(captain) else { throw Error.alreadyTaken }
+        self.captain = captain
+    }
+    
+    public func isAvailable(_ captain: Captain) -> Bool {
+        return !soldOutCaptains.contains(captain)
+    }
+    
+ 
+    public func makeTeam() -> CricketTeam{
+        return CricketTeam(captain: captain, batsmen: batsmen, bowlers: bowlers)
+    }
+ 
+}
+```
+
+We declare properties for captain, batsmen, bowlers. These are declared as var so that we can change the team’s composition based on the requirement. We are using private(set) for each to ensure only CricketTeamBuilder can set them directly. 
+
+Since each property is declared private, we need to provide public methods to change them. We defined methods like addBatsman, removeBatsman, addBowler, removeBowler etc for the purpose of building team.
+
+We have an interesting thing to note here. Every team by default should have a captain. Assume, you are starting a team with Dhoni as captain. What if some other team tries to choose Dhoni as captain too? We should throw some error using the array of soldOutCaptains. We check the availability of the captains via isAvailable method.
+
+We are done with the Builder. Now, let’s build our Director.
+
+```
+//MARK: -Director/ Maker
+public class TeamOwner {
+    
+    public func createTeam1() throws -> CricketTeam {
+        let teamBuilder = CricketTeamBuilder()
+        try teamBuilder.pickCaptain(.Kohli)
+        teamBuilder.addBatsman(.topOrderBatsman)
+        teamBuilder.addBowler([.fastBowler, .spinBowler])
+        return teamBuilder.makeTeam()
+    }
+ 
+ 
+    
+    public func createTeam2() throws -> CricketTeam {
+        let teamBuilder = CricketTeamBuilder()
+        try teamBuilder.pickCaptain(.Dhoni)
+        teamBuilder.addBatsman([.topOrderBatsman, .lowerOrderBatsman])
+        teamBuilder.addBowler([.mediumPaceBowler, .spinBowler])
+        return teamBuilder.makeTeam()
+    }
+ 
+}
+```
+
+We have a class called TeamOwner who builds their teams from the available options. Each team is built taking an instance of CricketTeamBuilder, picking up a captain and arrays of different types of batsman and bowlers.
+
+Now, let’s define a function called main to see the code in action.
+
+```
+func main(){
+    let owner = TeamOwner()
+    if let team = try? owner.createTeam1(){
+        print("Hello! " + team.description)
+    }
+  
+}
+ 
+main()
+```
+
+We try to use method createTeam1 with captain as Kohli. 
+
+Output in the Xcode console:
+
+Hello! Team with captain Kohli
+
+Now, change the main() to following:
+
+```
+func main(){
+    let owner = TeamOwner()
+    if let team = try? owner.createTeam1(){
+        print("Hello! " + team.description)
+    }
+    
+    if let team = try? owner.createTeam2(){
+        print("Hello! " + team.description)
+    } else{
+        print("Sorry! Captain already taken")
+    }
+}
+ 
+main()
+
+```
+
+After Team1, we are trying to create  a Team2 with the help of createTeam2() with Dhoni as captain. But Dhoni is already taken and we throw the error. 
+
+Output in the Xcode console:
+
+Hello! Team with captain Kohli
+Sorry! Captain already taken
+
+
+Summary:
+
+If you are trying to use the same code for building different products to isolate the complex construction code from business logic ,Builder design pattern fits the best.
+
+Also be careful that when your product does not require multiple parameters for initialisation or construction, it’s advised to stay away from Builder pattern.
+
