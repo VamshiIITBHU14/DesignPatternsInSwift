@@ -1843,6 +1843,133 @@ Summary:
 
 When you are in a situation where you have to change the implementation object inside the abstraction and when you need to extend a class in several independent dimensions, Bridge design pattern serves the best.
 
+**12) Structural - Composite Design Pattern:**
+
+Definition:
+
+Composite is a structural design pattern that lets us compose objects into tree structures and allows clients to work with these structures as if they were individual objects. Composition lets us make compound objects.
+
+Usage:
+
+Assume we are building a tree structure of a cricket team where each entity contains name, role, grade of contract as attributes. Let’s see how we can use composite design pattern to build such system.
+
+```
+import UIKit
+import Foundation
+ 
+class CricketTeamMember : CustomStringConvertible{
+    
+    var name : String
+    var role : String
+    var grade : String
+    var teamMembers : [CricketTeamMember]
+    
+    init(name:String, role : String, grade : String) {
+        self.name = name
+        self.role = role
+        self.grade = grade
+        self.teamMembers = [CricketTeamMember]()
+    }
+    
+    func addMember(member : CricketTeamMember){
+        teamMembers.append(member)
+    }
+    
+    func removeMember(member : CricketTeamMember){
+        teamMembers.append(member)
+    }
+    
+    func getListOfTeamMembers() -> [CricketTeamMember]{
+        return teamMembers
+    }
+    var description: String
+    {
+        let demo = "\(name)  \(role) \(grade)"
+        return demo
+        
+    }
+}
+```
+Let’s start with defining a class called CricketTeamMember conforming to CustomStringConvertible. It has got four properties like name of type string, role of type string, grade of type string and an array of teamMembers of type CricketTeamMember. It takes three parameters, namely name, role, grade of type String for its initialisation.
+
+We define a function called addMember which takes a CricketTeamMember object as parameter and appends it to the teamMembers array.
+
+We have a function named removeMember which takes a CricketTeamMember object as parameter and removes it from  teamMembers array.
+
+We have another function called getListOfTeamMembers which returns list of team members.
+
+Let us now define main function and see how the composite pattern can be used to define a tree structure.
+
+```
+func main(){
+ 
+//1
+ 
+    let headCoach = CricketTeamMember(name: "HeadCoach", role: "HeadCoach", grade: "A")
+    let captain = CricketTeamMember(name: "TeamCaptain", role: "Captain", grade: "B")
+    let bowlingCoach = CricketTeamMember(name: "BowlingCoach", role: "Coach", grade: "B")
+    let battingCoach = CricketTeamMember(name: "BattingCoach", role: "Coach", grade: "B")
+    let fieldingCoach = CricketTeamMember(name: "FieldingCoach", role: "Coach", grade: "B")
+    let asstBowlingCoach = CricketTeamMember(name: "ABoC1", role: "AsstCoach", grade: "C")
+    let asstBattingCoach = CricketTeamMember(name: "ABaC1", role: "AsstCoach", grade: "C")
+    let asstFieldingCoach = CricketTeamMember(name: "ABfC1", role: "AsstCoach", grade: "C")
+    let teamMember1 = CricketTeamMember(name: "TM1", role: "Player", grade: "B")
+    let teamMember2 = CricketTeamMember(name: "TM2", role: "Player", grade: "B")
+    
+  //2
+ 
+    headCoach.addMember(member: captain)
+    headCoach.addMember(member: bowlingCoach)
+    headCoach.addMember(member: battingCoach)
+    headCoach.addMember(member: fieldingCoach)
+    
+    captain.addMember(member: teamMember1)
+    captain.addMember(member: teamMember2)
+    
+    bowlingCoach.addMember(member: asstBowlingCoach)
+    battingCoach.addMember(member: asstBattingCoach)
+    fieldingCoach.addMember(member: asstFieldingCoach)
+ 
+//3
+ 
+    print(headCoach.description)
+    for member in headCoach.getListOfTeamMembers(){
+        print(member.description)
+        for member in member.getListOfTeamMembers(){
+             print(member.description)
+        }
+    }
+}
+ 
+main()
+```
+
+Let’s read this method step by step now.
+ 
+Here we define different team members using the instance of CricketTeamMember. We can see different roles like HeadCoach, TeamCaptain, BowlingCoach etc.
+ 
+We then start forming trees by adding all the captains and coaches under head coach. Adding team members under team captain etc.
+ 
+Here we start printing the trees. Initially we print the description of HeadCoach and then we loop through all the team members added under him and print their descriptions too.
+ 
+    
+Output in the Xcode console:
+ 
+HeadCoach  HeadCoach A
+TeamCaptain  Captain B
+TM1  Player B
+TM2  Player B
+BowlingCoach  Coach B
+ABoC1  AsstCoach C
+BattingCoach  Coach B
+ABaC1  AsstCoach C
+FieldingCoach  Coach B
+ABfC1  AsstCoach C
+ 
+Summary:
+ 
+When you are in a situation to simplify the code at client’s end that has to interact with a complex tree structure, then go for Composite design pattern. In other words, it should be used when clients need to ignore the difference between compositions of objects and individual objects.
+
  
 
 
