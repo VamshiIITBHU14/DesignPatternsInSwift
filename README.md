@@ -2114,4 +2114,157 @@ Summary:
 If you are in a situation where you are looking for something flexible than class inheritance and need to edit/ update behaviors at runtime, then Decorator design pattern serves you better.
 
 
+**14) Structural - Facade Design Pattern:**
+
+Definition:
+ 
+Facade is a structural design pattern that lets us expose several patterns through a single, easy to use interface. Facade defines a higher level interface that makes the subsystem easier to use by wrapping a complicated subsystem with a simpler interface.
+ 
+Usage:
+ 
+Assume we are building an imaginary player auction system for a private cricket league. Any team with an id and a name can buy players who have an id, role in the team and a price. Let’s write some code for this:
+ 
+```
+import UIKit
+import Foundation
+ 
+//Team represents an object that can buy a player
+public struct Team {
+    
+    public let teamId: String
+    public var teamName: String
+}
+ 
+public struct Player {
+    public let playerId: String
+    public var primaryRole: String
+    public var price: Double
+}
+```
+
+We define Team struct that holds the properties of teamId and teamName as String. Then there is another struct for Player that holds playerId, primaryRole as String and price as Double.
+
+```
+//Any Swift type that conforms the Hashable protocol must also conform the Equatable protocol. Because Hashable protocol is inherited from Equatable protocol
+ 
+extension Team: Hashable {
+    
+    public var hashValue : Int{
+        return teamId.hashValue
+    }
+ 
+    public static func == (lhs : Team, rhs : Team) -> Bool{
+        return lhs.teamId == rhs.teamId
+    }
+ 
+}
+ 
+extension Player : Hashable{
+    
+    public var hashValue : Int{
+        return playerId.hashValue
+    }
+    
+    public static func ==(lhs:Player, rhs:Player) ->Bool{
+        return lhs.playerId == rhs.playerId
+    }
+}
+ 
+```
+
+We write a couple of extensions, one for Team and one for Player, each conforming to Hashable protocol. When we conform to a hashable protocol we must have a hashValue property.
+ 
+Hashable is a type that has hashValue in the form of an integer that can be compared across different types. We get the hashValue as teamId.hashValue.  
+ 
+Apple definesEquatable as a type that can be compared for value equality, which is part of the working definition for a hashable protocol.
+ 
+We then use mandatory method related to Hashable protocol that compares the type and checks to see if they are equal.
+
+```
+public class AvailablePlayersList{
+    public var availablePlayers : [Player : Int] = [:]
+    
+    public init(availablePlayers : [Player:Int]){
+        self.availablePlayers = availablePlayers
+    }
+    
+}
+ 
+public class SoldPlayersList{
+    public var soldPlayers : [Team:[Player]] = [:]
+}
+```
+
+We define a class AvailablePlayersList which has a variable named availablePlayers of type Dictionary with Player type as key and their availability in number as int as value.
+ 
+Then we have another class SoldPlayerList which has a variable called soldPlayers which basically maintains a list of players bought by a certain team.
+ 
+Now we define our facade with the help of classes defined above!
+
+```
+public class AuctionFacade{
+    
+    public let availablePlayersList : AvailablePlayersList
+    public let soldPlayersList : SoldPlayersList
+    
+    public init(availablePlayersList:AvailablePlayersList, soldPlayersList:SoldPlayersList){
+        self.availablePlayersList = availablePlayersList
+        self.soldPlayersList = soldPlayersList
+    }
+    
+    public func buyAPlayer(for player: Player,
+                           by team: Team) {
+        
+        print("Ready to buy \(player.primaryRole) with id '\(player.playerId)' - '\(team.teamName)'")
+        
+        let count = availablePlayersList.availablePlayers[player, default: 0]
+        guard count > 0 else {
+            print("'\(player.primaryRole)' is sold out")
+            return
+        }
+     
+        availablePlayersList.availablePlayers[player] = count - 1
+ 
+        var soldOuts =
+            soldPlayersList.soldPlayers[team, default: []]
+        soldOuts.append(player)
+        soldPlayersList.soldPlayers[team] = soldOuts
+        
+        print("\(player.primaryRole) with \(player.playerId) " + "bought by '\(team.teamName)'")
+    }
+    
+}
+```
+
+AuctionFacade takes two parameters, one of type AvailablePlayersList and one of type SoldPlayerList during its initialisation. We then define a public method buyAplayer.
+ 
+As and when a player is bought, the count for that type of player is reduced by one in availablePlayerList. The same player is appended to the list of soldPlayersList.
+ 
+Let’s now write a main function to see facade in action.
+ 
+```
+func main(){
+    let bowler1 = Player(playerId: "12345", primaryRole: "Bowler", price: 123)
+    let batsman1 = Player(playerId: "12365", primaryRole: "Batsman", price: 152)
+    
+    let availablePlayerList = AvailablePlayersList(availablePlayers: [bowler1 : 3, batsman1:45])
+    let auctionFacade = AuctionFacade(availablePlayersList: availablePlayerList, soldPlayersList: SoldPlayersList())
+    let team1 = Team(teamId: "XYZ-123", teamName: "Sydney")
+    auctionFacade.buyAPlayer(for: bowler1, by: team1)
+}
+ 
+main()
+```
+We define bowler1 and batsman1 as Player type objects. We then initialise AvailablePlayerList with 3 bowler1 type Players and 45 batsman1 type Players.
+ 
+We then take an instance of AuctionFacade and provide availablePlayerList and instance of SoldPlayerList as parameters.
+ 
+Output in the Xcode console:
+ 
+Ready to buy Bowler with id '12345' - 'Sydney'
+Bowler with 12345 bought by 'Sydney'
+ 
+Summary:
+ 
+When you want to provide simple interface to a complex sub-system and have a single interface for traversing different data structures, Facade design patterns works the best.
 
