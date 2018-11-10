@@ -2508,3 +2508,299 @@ Summary:
 When you want to create a wrapper around main object to hide its complexity from client, Proxy design pattern suits the best. It also helps in delaying the object’s initialisation so that you can load the objects only when it is needed.
 
 
+**17) Behavioral - Chain of Responsibility Design Pattern:**
+
+Definition:
+
+Chain of Responsibility is a behavioral design pattern that lets us avoid coupling the sender of a request to its receiver by giving multiple objects a chance to handle the request. 
+
+Usage:
+
+Assume we are building a small cricket video game where we choose the player characters with their default skills. But then we also give provision to add skill boosters to the player characters as gamers gain some credits. Let us see how we can use Chain of Responsibility to design such system.
+
+```
+import Foundation
+ 
+class Cricketer : CustomStringConvertible{
+    var name : String
+    var battingSkillRating : Int
+    var bowlingSkillRating : Int
+    var fieldingSkillRating : Int
+    
+    init(_ name:String, _ battingSkillRating:Int, _ bowlingSkillRating:Int, _ fieldingSkillRating:Int) {
+        self.name = name
+        self.battingSkillRating = battingSkillRating
+        self.bowlingSkillRating  =  bowlingSkillRating
+        self.fieldingSkillRating = fieldingSkillRating
+    }
+    
+    var description: String{
+        return "Cricketer : \(name) with battingRating : \(battingSkillRating), bowlingRating : \(bowlingSkillRating), fieldingRating : \(fieldingSkillRating)"
+    }
+}
+```
+
+We define a class called Cricketer conforming to CustomStringConvertible. It takes parameters of name of type String, battingSkillRating of type Int, bowlingSkillRating of type Int, fieldingSkillRating of type Int during its initialisation.
+ 
+ ```
+class SkillBooster{
+    let cricketer : Cricketer
+    var skillBooster : SkillBooster?
+    
+    init(_ cricketer : Cricketer) {
+        self.cricketer = cricketer
+    }
+    
+    func addBooster(_ booster : SkillBooster){
+        if skillBooster != nil{
+            skillBooster!.addBooster(booster)
+        } else{
+            skillBooster = booster
+        }
+    }
+    
+    func playTheGame(){
+        skillBooster?.playTheGame()
+    }
+}
+ ```
+
+We then define a class called SkillBooster which is meant to be a base class for different types of boosters. It takes a parameter of type Cricketer during its initialisation. We also define an optional private variable of type SkillBooster.
+
+It has two methods defined addBooster and playTheGame. addBooster takes a parameter of type SkillBooster and checks if optional skillBooster is not equal to nil and add the incoming booster to existing ones. Else, skillBooster is assigned the value of incoming booster.
+
+```
+class BattingSkillBooster : SkillBooster{
+    override func playTheGame() {
+        print("Adding Hook Shot to \(cricketer.name) 's Batting")
+        cricketer.battingSkillRating += 1
+        super.playTheGame()
+    }
+}
+ 
+class BowlingSkillBooster : SkillBooster{
+    override func playTheGame() {
+        print("Adding Reverse Swing to \(cricketer.name) 's Bowling")
+        cricketer.bowlingSkillRating += 1
+        super.playTheGame()
+    }
+}
+ 
+class FieldingSkillBooster : SkillBooster{
+    override func playTheGame() {
+        print("Adding Dive Catches to \(cricketer.name) 's Fielding")
+        cricketer.fieldingSkillRating += 1
+        super.playTheGame()
+    }
+}
+```
+
+We define different types of skill boosters with SkillBooster as the base class. In all the boosters, we override the function playTheGame and improve the corresponding skill rating of the player character by 1.
+
+```
+class NoSkillBooster : SkillBooster{
+    override func playTheGame() {
+        print("No boosters available here")
+        //don't call super
+    }
+}
+```
+
+We also define a dummy skill booster just to make the game more interesting.
+ 
+Let us now write a main function to see the code in action:
+
+```
+func main(){
+    
+    let dhoni = Cricketer("Dhoni", 6, 3, 7)
+    print(dhoni)
+}
+ 
+main()
+```
+Output in the Xcode console:
+ 
+Cricketer : Dhoni with battingRating : 6, bowlingRating : 3, fieldingRating : 7
+ 
+Now change the main method to following:
+
+```
+func main(){
+    
+    let dhoni = Cricketer("Dhoni", 6, 3, 7)
+    print(dhoni)
+    
+    let skillBooster = SkillBooster(dhoni)
+    
+    print("Adding Batting Booster to Dhoni")
+    skillBooster.addBooster(BattingSkillBooster(dhoni))
+    skillBooster.playTheGame()
+    print(dhoni.description)
+    
+}
+ 
+main()
+```
+
+Output in the Xcode console:
+ 
+Cricketer : Dhoni with battingRating : 6, bowlingRating : 3, fieldingRating : 7
+Adding Batting Booster to Dhoni
+Adding Hook Shot to Dhoni 's Batting
+Cricketer : Dhoni with battingRating : 7, bowlingRating : 3, fieldingRating : 7
+ 
+We add BattingSkillBooster to object dhoni of type Cricketer. We can check the output in the console for an improved rating on dhoni’s batting skill.
+ 
+Change the main method to following and observe the console:
+
+```
+func main(){
+    
+    let dhoni = Cricketer("Dhoni", 6, 3, 7)
+    
+    let skillBooster = SkillBooster(dhoni)
+    
+    print("Adding Batting Booster to Dhoni")
+    skillBooster.addBooster(BattingSkillBooster(dhoni))
+    
+    print("Adding Bowling Booster to Dhoni")
+    skillBooster.addBooster(BowlingSkillBooster(dhoni))
+    skillBooster.playTheGame()
+    print(dhoni.description)
+}
+ 
+main()
+ 
+```
+Output in the Xcode console:
+ 
+Adding Batting Booster to Dhoni
+Adding Bowling Booster to Dhoni
+Adding Hook Shot to Dhoni 's Batting
+Adding Reverse Swing to Dhoni 's Bowling
+Cricketer : Dhoni with battingRating : 7, bowlingRating : 4, fieldingRating : 7
+ 
+Summary:
+ 
+Use the Chain of Responsibility pattern when you can conceptualize your program as a chain made up of links, where each link can either handle a request or pass it up the chain. It can modify an existing behaviour by overriding an existing method using inheritance.
+
+**18) Behavioral - Strategy Design Pattern:**
+
+Definition:
+
+Strategy is a behavioural design pattern that lets you define a set of encapsulated algorithms and enables selecting one of them at runtime. Important point to observe is that these algorithm implementations are interchangeable, i.e, strategy lets the algorithm vary independently from the clients that use it.
+
+Usage:
+
+Consider an example of a Bowling Machine which releases balls of different colours based on the input of speed specified by the user. Assume, we have three different speeds namely slow, medium, fast which corresponds to yellow, green, red coloured balls respectively.
+
+```
+import UIKit
+ 
+enum CricketBall : String{
+    case slow = "Yellow"
+    case medium = "Green"
+    case fast = "Red"
+}
+```
+
+We now define a protocol ReleaseCricketBallStrategy which has properties of speed and the type of cricket ball and also defines a method to release ball.
+
+```
+protocol ReleaseCricketBallStrategy{
+    var speed : String {get set}
+    var cricketBall : CricketBall {get set}
+    func releaseBall() -> String
+}
+```
+
+We now define three new classes , one each for fast, medium and slow ball strategies.
+
+Each of the classes conforms to ReleaseCricketBallStrategy protocol.
+For the sake of simplicity, we define speed as a string which can be Fast, Medium , Slow. Each of the classes has an initialiser which does not take any extra arguments.
+
+releaseBall method returns a string implying that its implementation releases a ball with specified properties.
+
+```
+class FastBallStrategy : ReleaseCricketBallStrategy{
+ 
+    var speed = "Fast"
+    var cricketBall = CricketBall.fast
+    init(){}
+ 
+    func releaseBall() -> String {
+        return "Released \(speed) ball with color \(cricketBall.rawValue)"
+    }
+}
+ 
+class MediumBallStrategy : ReleaseCricketBallStrategy{
+    var speed = "Medium"
+    var cricketBall = CricketBall.medium
+    init(){}
+ 
+    func releaseBall() -> String {
+        return "Released \(speed) ball with color \(cricketBall.rawValue)"
+    }
+}
+ 
+class SlowBallStrategy : ReleaseCricketBallStrategy{
+    var speed = "Slow"
+    var cricketBall = CricketBall.slow
+    init(){}
+ 
+    func releaseBall() -> String {
+        return "Released \(speed) ball with color \(cricketBall.rawValue)"
+    }
+}
+
+
+```
+
+Now, we define a BowlingMachine class which can be initialised at runtime by passing an argument of the type of strategy. We make it conform to CustomStringConvertible.
+
+```
+class BowlingMachine : CustomStringConvertible {
+    private var releaseCricketBallStrategy : ReleaseCricketBallStrategy
+    private var returnString = ""
+    init(whatStrategy : ReleaseCricketBallStrategy){
+        self.releaseCricketBallStrategy = whatStrategy
+        returnString = releaseCricketBallStrategy.releaseBall()
+    }
+    var description: String{
+        return returnString
+    }
+}
+```
+
+It’s now time to play with our bowling machine. We define a method named main where we initialise BowlingMachine class with different type of strategies. 
+
+```
+func main(){
+    var bowlingMachine = BowlingMachine(whatStrategy: FastBallStrategy())
+    print(bowlingMachine.description)
+ 
+    bowlingMachine = BowlingMachine(whatStrategy: SlowBallStrategy())
+    print(bowlingMachine.description)
+ 
+    bowlingMachine = BowlingMachine(whatStrategy: MediumBallStrategy())
+    print(bowlingMachine.description)
+ 
+}
+
+```
+
+Now, run the main() method.
+```main()```
+
+Output in the Xcode console:
+
+Released Fast ball with color Red
+Released Slow ball with color Yellow
+Released Medium ball with color Green
+
+
+Summary:
+
+Strategy pattern allows us to define a set of related algorithms and allows client to choose any of the algorithms at runtime. It allows us to add new algorithm without modifying existing algorithms.
+
