@@ -24,7 +24,8 @@ Let us design an imaginary operation system for a Cricket tournament. For the sa
 
 Every class is assigned its own responsibility and they will be responsible only for that action.
 
-```import UIKit
+```swift
+import UIKit
 import Foundation
  
 class TeamRegister : CustomStringConvertible{
@@ -56,7 +57,7 @@ We also define two methods. checkInGuest method takes the guest name as paramete
 
 checkOutGuest takes index of type Integer as parameter and removes the guest from register.
 
-```
+```swift
 class TeamConveyance {
     
     func takePlayersToStadium(_ teamRegister : TeamRegister){
@@ -73,7 +74,7 @@ TeamConveyance class has two responsibilites majorly. takePlayersToStadium takes
 
 Let us now write a function called main and see the code in action:
 
-```
+```swift
 func main(){
     let teamRegister = TeamRegister()
     let player1 = teamRegister.checkInGuest("PlayerOne")
@@ -94,7 +95,7 @@ Output in the Xcode console:
 
 Let us now check-out a guest and add one more guest to the team. Change the main function to :
 
-```
+```swift
 func main(){
     let teamRegister = TeamRegister()
     let player1 = teamRegister.checkInGuest("PlayerOne")
@@ -131,7 +132,7 @@ Output in the Xcode console:
 
 Now change the main method to following:
  
-```
+```swift
 func main(){
     let teamRegister = TeamRegister()
     let player1 = teamRegister.checkInGuest("PlayerOne")
@@ -196,7 +197,7 @@ Usage:
 
 Let us consider an example where we have an array of cricketers’ profiles where each entity has the name of cricketer, his team and his specialisation as the attributes. Now we want to build a system where the client can apply filters on the data based on different criteria like team , role of the player etc. Let us see how we can use OCP to build this:
 
-```
+```swift
 import Foundation
 import UIKit
  
@@ -217,7 +218,7 @@ enum Role{
 
 Enumeration is a data type that allows us to define list of possible values. We define enums for the available names of the teams and roles of the cricketers.
 
-```
+```swift
 class Cricketer{
     
     var name:String
@@ -237,7 +238,7 @@ We then define a class called Cricketer which takes three parameters during its 
  
 Now assume, one of the client requirements is to provide a filter of cricketers based on their team. 
 
-```
+```swift
 class CricketerFilter{
  
      func filterByTeam(_ cricketers:[Cricketer], _ team:Team) -> [Cricketer]{
@@ -257,7 +258,7 @@ We write a class called CricketerFilter and define a method filterByTeam to filt
  
 For each cricketer in the given array, we check if his team is same as that of the given team for filter, add him to the filtered array. Let us see this code in action. Add the below code after CricketerFilter class.
 
-```
+```swift
 func main(){
     let dhoni = Cricketer("Dhoni", .india, .batsman)
     let kohli = Cricketer("Kohli",  .india, .batsman)
@@ -287,7 +288,7 @@ Output in the Xcode console:
  
 Assume, after a few days, we got a new requirement to be able to filter by role of the cricketer and then to filter by both team and role at once. Our CricketerFilter class would look something like this:
 
-```
+```swift
 class CricketerFilter{
  
     func filterByRole(_ cricketers:[Cricketer], _ role:Role) -> [Cricketer]{
@@ -327,7 +328,7 @@ This logic is quite similar to filterByTeam method. Only that, for filterByRole,
  
 But the OCP states that classes should be closed for modification and open for extension. But here we are clearly breaking this principle. Let us see how the same use-case can be served with the help of OCP.
 
-```
+```swift
 //Conditions
 protocol Condition{
     associatedtype T
@@ -337,7 +338,7 @@ protocol Condition{
 
 We begin by defining a protocol called Condition which basically checks if a particular item satisfies some criteria. We have a function called isConditionMet which takes an item of generic type T and returns a boolean indicating whether the item meets the given criteria.
 
-```
+```swift
 protocol Filter
 {
     associatedtype T
@@ -350,7 +351,7 @@ We then define a protocol named Filter which has a function called filter which 
  
 We now use the above generic type Filter to write conditions for role and team.
 
-```
+```swift
 class RoleCondition : Condition
 {
     typealias T = Cricketer
@@ -383,7 +384,7 @@ class TeamCondition : Condition
 
 In each of the methods, we write the logic of isConditionMet protocol method to see if the item meets the criteria and return a boolean.
 
-```
+```swift
 class OCPCricketFilter : Filter
 {
     typealias T = Cricketer
@@ -408,7 +409,7 @@ Now we define a brand new filter called OCPCricketFilter, usage of which does no
  
 Let us now see the code in action. Change the main method to following.
 
-```
+```swift
 func main(){
     let dhoni = Cricketer("Dhoni", .india, .batsman)
     let kohli = Cricketer("Kohli",  .india, .batsman)
@@ -440,7 +441,7 @@ Output in the Xcode console:
  
 In the similar way, without modifying any existing classes, we can extend the OCPCricketFilter class to as many filters as we need. Now we will see how we can write a filter for AND condition ( role and team for example):
 
-```
+```swift
 class AndCondition<T,
     CondA: Condition,
     CondB: Condition> : Condition
@@ -464,7 +465,7 @@ This is very much similar to other filters with the only change that it takes tw
  
 Change the main method to below code :
 
-```
+```swift
 func main(){
     let dhoni = Cricketer("Dhoni", .india, .batsman)
     let kohli = Cricketer("Kohli",  .india, .batsman)
@@ -506,7 +507,7 @@ Usage:
 
 Let us understand LSP’s usage with a simple example. 
 
-```
+```swift
 import UIKit
 import Foundation
  
@@ -519,7 +520,7 @@ protocol Cricketer {
 
 We define a protocol called Cricketer which implements three methods of canBat, canBowl, canField.
 
-```
+```swift
 class AllRounder : Cricketer{
     func canBat() {
         print("I can bat")
@@ -536,7 +537,7 @@ class AllRounder : Cricketer{
 ```
 We then define a class called AllRounder conforming to Cricketer protocol. An all-rounder in cricket is someone who can bat, bowl and field.
 
-```
+```swift
 class Batsman : Cricketer{
     func canBat() {
         print("I can bat")
@@ -555,7 +556,7 @@ class Batsman : Cricketer{
 
 We then define a class called Batsman conforming to Cricketer protocol. This is violation of LSP as a batsman is a cricketer but cannot use Cricketer protocol because he cannot bowl. Let us now see how we can use LSP in this scenario:
 
-```
+```swift
 protocol Cricketer {
     func canBat()
     func canField()
@@ -573,7 +574,7 @@ class Batsman : Cricketer{
 ```
 We change the Cricketer protocol and now make the Batsman class conform to Cricketer protocol.
 
-```
+```swift
 class BatsmanWhoCanBowl : Cricketer{
  
     func canBat() {
@@ -610,7 +611,7 @@ Let us assume we are building a screen display for mobile, tablet, desktop inter
 We will see how this can be achieved without using ISP and then using ISP.
  
 
-```
+```swift
 import UIKit
 import Foundation
  
@@ -627,7 +628,7 @@ protocol MatchSummaryDisplay{
 
 We define a protocol named MatchSummaryDisplay which has four methods to show live score, commentary, twitter feed about the match and statistics of the players.
 
-```
+```swift
 enum NoScreenEstate : Error
 {
     case doesNotShowLiveTwitterFeed
@@ -649,7 +650,7 @@ extension NoScreenEstate: LocalizedError {
 
 By default, we want to show live score and commentary on the all types of devices like mobile, tablet, desktop. Showing twitter feed and statistics are optional, depending on the screen estate available on the device. So, we define an enum called NoScreenEstate with two possible cases. We also write an extension to it just to make the error descriptions more clear.
 
-```
+```swift
 class DesktopDisplay:MatchSummaryDisplay{
     func showLiveScore() {
         print("Showing Live Score On Desktop")
@@ -671,7 +672,7 @@ class DesktopDisplay:MatchSummaryDisplay{
 
 We start the interface design by defining a class called DesktopDisplay conforming to MatchSummaryDisplay. A desktop has enough screen space available and we show all the available data to the user.
 
-```
+```swift
 class TabletDisplay:MatchSummaryDisplay{
     func showLiveScore() {
         print("Showing Live Score On Tablet")
@@ -700,7 +701,7 @@ class TabletDisplay:MatchSummaryDisplay{
  
 We then define another class called called TabletDisplay conforming to MatchSummaryDisplay. As the screen size of tablet is less when compared to desktop, we do not show smart stats on iPad display. We throw an error in showSmartStats method.
 
-```
+```swift
 class MobileDisplay:MatchSummaryDisplay{
     func showLiveScore() {
         print("Showing Live Score On Mobile")
@@ -736,7 +737,7 @@ We then define another class called called MobileDisplay conforming to MatchSumm
  
 As you can see, this approach violates ISP because TabletDisplay and MobileDisplay are forced to implement methods they are not using. Let’s see how we can use ISP in this scenario.
 
-```
+```swift
 //Following ISP
  
 protocol LiveScoreDisplay{
@@ -755,7 +756,7 @@ protocol SmartStatsDisplay{
 
 Here we define a protocol named LiveScoreDisplay which is mandatory for all the screen sizes of the devices. Then we define different protocols called TwitterFeedDisplay and SmartStatsDisplay so that only the devices with enough screen sizes can conform to required protocols.
 
-```
+```swift
 class ISPMobileDisplay:LiveScoreDisplay{
     func showLiveScore() {
         print("Showing Live Score On Mobile")
@@ -771,7 +772,7 @@ class ISPMobileDisplay:LiveScoreDisplay{
  
 We define a class called ISPMobileDisplay which conforms only to LiveScoreDisplay and we don’t have to force the class to implement any unwanted methods. 
 
-```
+```swift
 class ISPTabletDisplay:LiveScoreDisplay, TwitterFeedDisplay{
     
     func showLiveScore() {
@@ -793,7 +794,7 @@ We then define a class called ISPTabletDisplay which conforms to TwitterFeedDisp
  
 We can define desktop interface as follows.
 
-```
+```swift
 class ISPDesktopDisplay:LiveScoreDisplay, TwitterFeedDisplay, SmartStatsDisplay{
     
     func showLiveScore() {
@@ -828,7 +829,7 @@ Usage:
  
 Let us assume we are designing a small system where we want to list all the wickets taken by a bowler in his cricketing career from the database.
 
-```
+```swift
 import Foundation
 import UIKit
  
@@ -848,7 +849,7 @@ class Cricketer{
 ```
 We define an enum called WicketsColumn with a list of two possible cases. We then define a class called Cricketer which takes the parameter of name of type String for its initialisation.
 
-```
+```swift
 protocol WicketsTallyBrowser{
     func returnAllWicketsTakenByBowler(_ name:String) -> [Cricketer]
 }
@@ -858,7 +859,7 @@ We define a protocol named WicketsTallyBrowser which has a function to return al
  
 We will now define a class/ a storage which stores relationship between bowlers and batsmen.
 
-```
+```swift
 class WicketsTally : WicketsTallyBrowser { //Low Level
      var wickets = [(Cricketer, WicketsColumn, Cricketer)]()
     
@@ -881,7 +882,7 @@ Then we define a method called addToTally which takes parameters of bowler and b
  
 In the definition of protocol method returnAllWicketsTakenByBowler, we filter the wickets array by comparing first attribute of tuple to the name of given bowler.
 
-```
+```swift
 class PlayerStats{ //High Level
     init(_ wicketsTally : WicketsTally){
         let wickets = wicketsTally.wickets
@@ -895,7 +896,7 @@ We now define a class called PlayerStats where we use the logic written in Wicke
  
 Let us now write a main method to see this code in action:
 
-```
+```swift
 func main(){
     let bowler = Cricketer("BrettLee")
     let batsman1 = Cricketer("Sachin")
@@ -922,7 +923,7 @@ The issue with the above approach is its violation of DIP (it states that the hi
  
 Let us now change the WicketsTally class this way:
 
-```
+```swift
 class WicketsTally : WicketsTallyBrowser { //Low Level
      private var wickets = [(Cricketer, WicketsColumn, Cricketer)]()
     
@@ -940,7 +941,7 @@ class WicketsTally : WicketsTallyBrowser { //Low Level
 ```
 Now change the PlayerStats class to:
 
-```
+```swift
 class PlayerStats{ //High Level
     init(_ browser : WicketsTallyBrowser){
         for w in browser.returnAllWicketsTakenByBowler("BrettLee"){
@@ -967,7 +968,7 @@ Usage:
 
 Assume there is a BowlingMachine which delivers Red Cricket Balls (used for Test Cricket) and White Crikcet Balls (used for Limited Overs Cricket) based on user input.
 
-```
+```swift
 import UIKit
  
 protocol CricketBall{
@@ -992,7 +993,7 @@ class WhiteBall : CricketBall{
 
 Let us start defining factories now.
 
-```
+```swift
 protocol CricketBallFactory{
  
     init()
@@ -1003,7 +1004,7 @@ Factories conforming to CricketBallFactory must implement deliverTheBall. We sho
 
 Now, moving out of abstract classes creating objects, we start defining subclasses for object creation.
 
-```
+```swift
 class RedBallFactory{
     func deliverTheBall (_ speed : Int) -> CricketBall{
           print("Releasing Red Ball at \(speed) speed")
@@ -1022,7 +1023,7 @@ Here we are defining two factories to deliver different colours of balls. We inp
 
 It’s time we go to the machine and give an input to deliver the balls.
 
-```
+```swift
 class BowlingMachine{
     enum AvailableBall : String{ 
         case redBall = "RedBall"
@@ -1065,7 +1066,7 @@ We then define a function which asks us to set the ball and returns a cricket ba
  
 Let’s now define a function called main and see the code in action.
 
-```
+```swift
 func main(){
     let bowlingMachine = BowlingMachine()
     print(bowlingMachine.namedFactories.count)
@@ -1110,7 +1111,7 @@ Let us assume we are creating a cricket team which consists of a captain, batsme
 
 We start with the Product part first.
 
-```
+```swift
 import UIKit
  
 //MARK: -Product
@@ -1128,7 +1129,7 @@ extension CricketTeam : CustomStringConvertible{
 ```
 We first define CricketTeam, which has properties for captain, batsmen and bowlers. Once a team is set, we shouldn’t be able to change its composition. We also make CricketTeam conform to CustomStringConvertible.
 
-```
+```swift
 public enum Captain : String{
     case Dhoni
     case Kohli
@@ -1137,7 +1138,7 @@ public enum Captain : String{
 ```
 We declare Captain as enum. Each team can have only one captain.
 
-```
+```swift
 public struct Batsmen : OptionSet{
     public static let topOrderBatsman = Batsmen(rawValue: 1 << 0)
     public static let middleOrderBatsman = Batsmen(rawValue: 1 << 1)
@@ -1165,7 +1166,7 @@ We define Batsmen and Bowlers as OptionSet. This allows us to try different comb
 
 Add the following code to make Builder.
 
-```
+```swift
 //MARK: -Builder
 public class CricketTeamBuilder{
     
@@ -1219,7 +1220,7 @@ We have an interesting thing to note here. Every team by default should have a c
 
 We are done with the Builder. Now, let’s build our Director.
 
-```
+```swift
 //MARK: -Director/ Maker
 public class TeamOwner {
     
@@ -1248,7 +1249,7 @@ We have a class called TeamOwner who builds their teams from the available optio
 
 Now, let’s define a function called main to see the code in action.
 
-```
+```swift
 func main(){
     let owner = TeamOwner()
     if let team = try? owner.createTeam1(){
@@ -1268,7 +1269,7 @@ Hello! Team with captain Kohli
 
 Now, change the main() to following:
 
-```
+```swift
 func main(){
     let owner = TeamOwner()
     if let team = try? owner.createTeam1(){
@@ -1310,7 +1311,7 @@ Usage:
 
 Let us consider a simple use case where we want to create the profile of two cricketers which includes their name, and a custom profile which includes runs scored and wickets taken. 
 
-```
+```swift
 import UIKit
  
 class Profile : CustomStringConvertible{
@@ -1333,7 +1334,7 @@ First, we create a Profile class which conforms to CustomStringConvertible. It h
 
 Then we define a Cricketer class conforms to CustomStringConvertible. It has two properties, name of type String and profile of custom type Profile which we just created.
 
-```
+```swift
 class Cricketer : CustomStringConvertible {
     var name : String
     var profile : Profile
@@ -1351,7 +1352,7 @@ class Cricketer : CustomStringConvertible {
 
 Let us now write a function called main to see the things in action.
 
-```
+```swift
 func main (){
     let profile = Profile(1200, 123)
     let bhuvi = Cricketer("Bhuvi", profile)
@@ -1369,7 +1370,7 @@ Now we need to talk about copying the objects.
 
 Just before print statement in the main function, add the following lines .
 
-```
+```swift
 var ishant = bhuvi
 ishant.name = "Ishant"
 print(ishant.description)
@@ -1384,7 +1385,9 @@ This is because we are only copying the references.
  
 Now add this line just before printing ishant’s description.
 
-```ishant.profile.runsScored = 600```
+```swift
+ishant.profile.runsScored = 600
+```
 
 It prints
 Ishant : Profile : 600 Runs Scored & 123 Wickets Taken
@@ -1396,7 +1399,7 @@ Now, we need to make sure bhuvi and ishant actually refer to different objects.
  
 Here, we use the concept of Deep Copy. When we deep copy objects, the system will copy references and each copied reference will be pointing to its own copied memory object. Let us now see how to implement Deep Copy interface for our use case.
 
-```
+```swift
 protocol DeepCopy{
     func createDeepCopy () -> Self
 }
@@ -1407,7 +1410,7 @@ First, we create a DeepCopy protocol which defines a function called createDeepC
  
 Then make the classes Profile and Cricketer conform to DeepCopy protocol. Classes now look like:
 
-```
+```swift
 class Profile : CustomStringConvertible, DeepCopy{
     var runsScored : Int
     var wicketsTaken : Int
@@ -1435,7 +1438,7 @@ We have a private method called deepCopyImplementation which is generic and and 
  
 Cricketer class now looks like:
 
-```
+```swift
 class Cricketer : CustomStringConvertible ,DeepCopy{
     var name : String
     var profile : Profile
@@ -1461,7 +1464,7 @@ class Cricketer : CustomStringConvertible ,DeepCopy{
 ```
 Let us define our main method as below and see the results:
 
-```
+```swift
 func main(){
     let profile = Profile(1200, 123)
     let bhuvi = Cricketer("Bhuvi", profile)
@@ -1507,7 +1510,7 @@ This data-structure is an Array where each object is a key-value pair. Key repre
 
 We would need only one instance of the SingletonDatabase class in order to save this data to our database. There is no point in initialising database class more than once as it would just waste memory. Our code looks like this:
 
-```
+```swift
 import UIKit
 class SingletonDatabase{
     var dataSource = ["Sachin" : 1, "Sehwag" : 2 , "Dravid" : 3, "Kohli" : 4, "Yuvraj" : 5   ,"Dhoni" : 6 ,"Jadeja" : 7 ,"Ashwin" : 8, "Zaheer" : 9 ,"Bhuvi" : 10, "Bumrah" : 11]
@@ -1538,7 +1541,7 @@ Now we add the data coming from API call to our array of cricketers. That’s it
  
 Now, how does someone have access to this database? Assume we want to know the position at which a cricketer bats. We write a function for that just after the private init() method in SingletonDatabase class.
 
-```
+```swift
 func getRunsScoredByCricketer(name:String) -> Int{
         if let position = cricketers[name]{
             print("\(name) bats at number \(position) for Indian Crikcet Team")
@@ -1553,7 +1556,7 @@ This method is straightforward which takes name of the cricketer as an argument 
  
 Inorder for us to access this class at some point in our code, we write it this way:
 
-```
+```swift
 func main(){
     let singleton = SingletonDatabase.instance
     singleton.getRunsScoredByCricketer(name: "Sachin")
@@ -1564,7 +1567,9 @@ Very simple and short. We create a variable named singleton which helps us in ac
  
 Now run the main() method.
 
-```main()```
+```swift
+main()
+```
 
 Output in the Xcode console:
 
@@ -1581,7 +1586,7 @@ We missed out discussing variable named instanceCount in our private init() meth
  
 Change the main method this way.
 
-```
+```swift
 func main(){
     let singleton1 = SingletonDatabase.instance
     print(SingletonDatabase.instanceCount)
@@ -1602,7 +1607,7 @@ Instance count remains 1 even though we initialised the class more than once.
 
 Adding the code snippet for another self explanatory example here which would enhance your understanding:
 
-```
+```swift
 import UIKit
  
 class PlayerRating : CustomStringConvertible{
@@ -1664,7 +1669,7 @@ So we will use adapter pattern. Here our client would be T20Batsman and adaptee 
 
 Let us now write code:
 
-```
+```swift
 import UIKit
  
 protocol TestBatsman {
@@ -1675,7 +1680,7 @@ protocol TestBatsman {
 
 A simple protocol named TestBatsman defining two methods, makeRuns and fieldWell.
 
-```
+```swift
 class Batsman1 : TestBatsman{
     func makeRuns() {
         print("I can bat well but only at StrikeRate of 80")
@@ -1688,14 +1693,14 @@ class Batsman1 : TestBatsman{
 ```
 
 We define a Batsman1 class conforming to TestBatsman protocol. This type of batsman can make runs at a strike rate of 80.
-```
+```swift
 protocol T20Batsman{
     func batAggressively()
 }
 ```
 
 We have one more protocol named T20Batsman which defines batAggressively method.
-```
+```swift
 class Batsman2 : T20Batsman{
     func batAggressively() {
          print("I need to bat well at a StrikeRate of more than 130")
@@ -1707,7 +1712,7 @@ We define a Batsman2 class conforming to T20Batsman protocol. This type of batsm
  
 Now considering our situation, we need to make an adapter in such a way that TestBatsman can fit to be a T20Batsman.
 
-```
+```swift
 class TestBatsmanAdapter : T20Batsman{
     let testBatsman : TestBatsman
     init (_ testBatsman : TestBatsman){
@@ -1745,7 +1750,7 @@ Bridge is a structural design pattern which lets us connect components together 
 Usage:
 Let us suppose that we have a protocol named Batsman whose main function is to make runs for his team.
 
-```
+```swift
 import Foundation
 import UIKit
  
@@ -1758,7 +1763,7 @@ protocol Batsman
 makeRuns takes a parameter named numberOfBalls of type Int. 
 Let us now define three different classes of batsmen conforming to Batsman protocol.
 
-```
+```swift
 class TestBatsman : Batsman
 {
     func makeRuns(_ numberOfBalls: Int) {
@@ -1786,14 +1791,14 @@ We have three types of batsmen with the only difference between them being the n
 
 Let us now define a protocol Player whose main function is to play.
 
-```
+```swift
 protocol Player
 {
     func play()
 }
 ```
 We now define a Cricketer class conforming to Player protocol.
-```
+```swift
 class Cricketer : Player
 {
     var numberOfBalls: Int
@@ -1816,7 +1821,7 @@ Cricketer class takes two parameters, one of type Batsman and the other of type 
 
 Let us now define our main function and see how this design pattern works.
 
-```
+```swift
 func main()
 {
     let testBatsman = TestBatsman()
@@ -1856,7 +1861,7 @@ Usage:
 
 Assume we are building a tree structure of a cricket team where each entity contains name, role, grade of contract as attributes. Let’s see how we can use composite design pattern to build such system.
 
-```
+```swift
 import UIKit
 import Foundation
  
@@ -1903,7 +1908,7 @@ We have another function called getListOfTeamMembers which returns list of team 
 
 Let us now define main function and see how the composite pattern can be used to define a tree structure.
 
-```
+```swift
 func main(){
  
 //1
@@ -1982,7 +1987,7 @@ Decorator is a structural design pattern lets us add new behavior to the objects
 Usage:
 
 Assume we are checking if a player is fit for playing T20 game of cricket as a bowler or batsman or both or none based on his batting and bowling statistics. Let us see how Decorator design pattern can help us here.
-```
+```swift
 import UIKit
 import Foundation
  
@@ -1998,7 +2003,7 @@ class T20Batsman{
 ```
 We write a class called T20Batsman with a property called strikeRate of type Int. It has a function defined called makeRuns which tells us if the batsman is fit for T20 team based on his strikeRate. If the strike rate is more than 130, he is fit as T20 batsman, else he is too slow for the game.
 
-```
+```swift
 class T20Bolwer{
     
     var economyRate : Float = 0
@@ -2012,7 +2017,7 @@ class T20Bolwer{
 
 We then define a class called T20Bolwer with a property called economyRate of type Float. It has a function defined called bowlEconomically which tells us if the bowler is fit for T20 team based on his economyRate. If the economy rate is less than 8.0, he is fit as T20 bowler, else he is too expensive as a bowler for the game.
  
-```
+```swift
 class T20AllRounder : CustomStringConvertible{
     private var _strikeRate : Int = 0
     private var _economyRate : Float = 0
@@ -2071,7 +2076,7 @@ In case, in future if we want to change the conditions for batsmen or bowler or 
  
 Let us now write a main function to see the code in action:
 
-```
+```swift
 func main(){
     
     let t20AllRounder = T20AllRounder()
@@ -2092,20 +2097,21 @@ Too slow Batsman for T20 Team & Fit for T20 Team as Bowler
  
 Keep changing the inputs for strikeRate and economyRate and see if the player is fit for T20 game of cricket.
 
-```t20AllRounder.strikeRate = 150
+```swift
+t20AllRounder.strikeRate = 150
 t20AllRounder.economyRate = 7
 ```
  
 Prints : Fit as T20 AllRounder
  
-```
+```swift
 t20AllRounder.strikeRate = 150
 t20AllRounder.economyRate = 9
 ```
  
 Prints: Fit for T20 Team as Batsman & Too expensive as a Bowler
  
-```
+```swift
 t20AllRounder.strikeRate = 120
 t20AllRounder.economyRate = 9
 ```
@@ -2127,7 +2133,7 @@ Usage:
  
 Assume we are building an imaginary player auction system for a private cricket league. Any team with an id and a name can buy players who have an id, role in the team and a price. Let’s write some code for this:
  
-```
+```swift
 import UIKit
 import Foundation
  
@@ -2147,7 +2153,7 @@ public struct Player {
 
 We define Team struct that holds the properties of teamId and teamName as String. Then there is another struct for Player that holds playerId, primaryRole as String and price as Double.
 
-```
+```swift
 //Any Swift type that conforms the Hashable protocol must also conform the Equatable protocol. Because Hashable protocol is inherited from Equatable protocol
  
 extension Team: Hashable {
@@ -2183,7 +2189,7 @@ Apple definesEquatable as a type that can be compared for value equality, which 
  
 We then use mandatory method related to Hashable protocol that compares the type and checks to see if they are equal.
 
-```
+```swift
 public class AvailablePlayersList{
     public var availablePlayers : [Player : Int] = [:]
     
@@ -2204,7 +2210,7 @@ Then we have another class SoldPlayerList which has a variable called soldPlayer
  
 Now we define our facade with the help of classes defined above!
 
-```
+```swift
 public class AuctionFacade{
     
     public let availablePlayersList : AvailablePlayersList
@@ -2245,7 +2251,7 @@ As and when a player is bought, the count for that type of player is reduced by 
  
 Let’s now write a main function to see facade in action.
  
-```
+```swift
 func main(){
     let bowler1 = Player(playerId: "12345", primaryRole: "Bowler", price: 123)
     let batsman1 = Player(playerId: "12365", primaryRole: "Batsman", price: 152)
@@ -2285,7 +2291,7 @@ Let us consider a situation where we are storing player profiles where each enti
 
 We write the code without using FlyWeight design pattern and check the memory occupied.
 
-```
+```swift
 import UIKit
 import Foundation
  
@@ -2314,7 +2320,7 @@ We define a class called PlayerProfile which takes fullName of type String and t
 
 We then define a variable called charCount which is indicator of the memory occupied. Let us write our main function anc check the character count.
 
-```
+```swift
 func main()
 {
     let dhoni = PlayerProfile("Mahendra Dhoni",["India ,Chennai"])
@@ -2335,7 +2341,7 @@ Total number of chars used: 82
 
 Let us now use FlyWeight design pattern for the same use case.
 
-```
+```swift
 class PlayerProfileOptimised{
     static var stringsArray = [String]()
     private var genericNames = [Int]()
@@ -2376,7 +2382,7 @@ We then initialise the genericNames array by taking the full name and split it i
 
 Let us now write main function and check the character count:
 
-```
+```swift
 func main()
 {
     let dhoni1 = PlayerProfileOptimised("Mahendra Dhoni",["India ,Chennai"])
@@ -2411,7 +2417,7 @@ Assume we are designing a small software to filter applicants for the position o
 
 Let us see how we can use Proxy design pattern here:
 
-```
+```swift
 import UIKit
 import Foundation
  
@@ -2433,7 +2439,7 @@ class CricketCoach : Coach
 We define a protocol called Coach whose main job is to mentor the team.
 Then we define a class called CricketCoach conforming to Coach protocol. 
 
-```
+```swift
 class CoachApplicant
 {
     var numberOfYearsOfExperience: Int
@@ -2449,7 +2455,7 @@ We write a class called CoachApplicant which takes numberOfYearsOfExperience of 
  
 Now we write a proxy conforming to Coach protocol to define the logic to filter applicants.
 
-```
+```swift
 class CricketCoachProxy : Coach
 {
     private let cricketCoach = CricketCoach()
@@ -2475,7 +2481,7 @@ It has got two private variables, one of type CricketCoach and one of type Coach
 
 Let us now write our main method:
  
- ```
+```swift
 func main()
 {
     let coach : Coach = CricketCoachProxy(coachApplicant: CoachApplicant(numberOfYearsOfExperience: 8))
@@ -2491,7 +2497,8 @@ Mentoring the Cricket Team
 
 Keep changing the experience parameter and check the output.
  
-```func main()
+```swift
+func main()
 {
     let coach : Coach = CricketCoachProxy(coachApplicant: CoachApplicant(numberOfYearsOfExperience: 5))
     coach.mentorTheTeam()
@@ -2521,7 +2528,7 @@ Usage:
 
 Assume we are building a small cricket video game where we choose the player characters with their default skills. But then we also give provision to add skill boosters to the player characters as gamers gain some credits. Let us see how we can use Chain of Responsibility to design such system.
 
-```
+```swift
 import Foundation
  
 class Cricketer : CustomStringConvertible{
@@ -2545,7 +2552,7 @@ class Cricketer : CustomStringConvertible{
 
 We define a class called Cricketer conforming to CustomStringConvertible. It takes parameters of name of type String, battingSkillRating of type Int, bowlingSkillRating of type Int, fieldingSkillRating of type Int during its initialisation.
  
- ```
+```swift
 class SkillBooster{
     let cricketer : Cricketer
     var skillBooster : SkillBooster?
@@ -2566,13 +2573,13 @@ class SkillBooster{
         skillBooster?.playTheGame()
     }
 }
- ```
+```
 
 We then define a class called SkillBooster which is meant to be a base class for different types of boosters. It takes a parameter of type Cricketer during its initialisation. We also define an optional private variable of type SkillBooster.
 
 It has two methods defined addBooster and playTheGame. addBooster takes a parameter of type SkillBooster and checks if optional skillBooster is not equal to nil and add the incoming booster to existing ones. Else, skillBooster is assigned the value of incoming booster.
 
-```
+```swift
 class BattingSkillBooster : SkillBooster{
     override func playTheGame() {
         print("Adding Hook Shot to \(cricketer.name) 's Batting")
@@ -2600,7 +2607,7 @@ class FieldingSkillBooster : SkillBooster{
 
 We define different types of skill boosters with SkillBooster as the base class. In all the boosters, we override the function playTheGame and improve the corresponding skill rating of the player character by 1.
 
-```
+```swift
 class NoSkillBooster : SkillBooster{
     override func playTheGame() {
         print("No boosters available here")
@@ -2613,7 +2620,7 @@ We also define a dummy skill booster just to make the game more interesting.
  
 Let us now write a main function to see the code in action:
 
-```
+```swift
 func main(){
     
     let dhoni = Cricketer("Dhoni", 6, 3, 7)
@@ -2628,7 +2635,7 @@ Cricketer : Dhoni with battingRating : 6, bowlingRating : 3, fieldingRating : 7
  
 Now change the main method to following:
 
-```
+```swift
 func main(){
     
     let dhoni = Cricketer("Dhoni", 6, 3, 7)
@@ -2657,7 +2664,7 @@ We add BattingSkillBooster to object dhoni of type Cricketer. We can check the o
  
 Change the main method to following and observe the console:
 
-```
+```swift
 func main(){
     
     let dhoni = Cricketer("Dhoni", 6, 3, 7)
@@ -2698,7 +2705,7 @@ Usage:
 
 Consider an example of a Bowling Machine which releases balls of different colours based on the input of speed specified by the user. Assume, we have three different speeds namely slow, medium, fast which corresponds to yellow, green, red coloured balls respectively.
 
-```
+```swift
 import UIKit
  
 enum CricketBall : String{
@@ -2710,7 +2717,7 @@ enum CricketBall : String{
 
 We now define a protocol ReleaseCricketBallStrategy which has properties of speed and the type of cricket ball and also defines a method to release ball.
 
-```
+```swift
 protocol ReleaseCricketBallStrategy{
     var speed : String {get set}
     var cricketBall : CricketBall {get set}
@@ -2725,7 +2732,7 @@ For the sake of simplicity, we define speed as a string which can be Fast, Mediu
 
 releaseBall method returns a string implying that its implementation releases a ball with specified properties.
 
-```
+```swift
 class FastBallStrategy : ReleaseCricketBallStrategy{
  
     var speed = "Fast"
@@ -2762,7 +2769,7 @@ class SlowBallStrategy : ReleaseCricketBallStrategy{
 
 Now, we define a BowlingMachine class which can be initialised at runtime by passing an argument of the type of strategy. We make it conform to CustomStringConvertible.
 
-```
+```swift
 class BowlingMachine : CustomStringConvertible {
     private var releaseCricketBallStrategy : ReleaseCricketBallStrategy
     private var returnString = ""
@@ -2778,7 +2785,7 @@ class BowlingMachine : CustomStringConvertible {
 
 It’s now time to play with our bowling machine. We define a method named main where we initialise BowlingMachine class with different type of strategies. 
 
-```
+```swift
 func main(){
     var bowlingMachine = BowlingMachine(whatStrategy: FastBallStrategy())
     print(bowlingMachine.description)
@@ -2794,7 +2801,9 @@ func main(){
 ```
 
 Now, run the main() method.
-```main()```
+```swift
+main()
+```
 
 Output in the Xcode console:
 
@@ -2821,7 +2830,7 @@ Let us consider a decision review system in a cricket match where the on-field u
 
 Let’s see how we can design such system with the help of Command design pattern.
 
-```
+```swift
 import UIKit
 import Foundation
  
@@ -2850,7 +2859,7 @@ class ScreenDisplay{
 We then define a class called ScreenDisplay which is used to display the decision made by the TV umpire to public. It has a private variable named showOutOnDisplay which is initialised to false. 
 It has two methods defined. Based on the bool property, these methods show batsman OUT/ NOT OUT on the screen.
 
-```
+```swift
 class BatsmanOutCommand : Command{
     var screenDisplay : ScreenDisplay
     
@@ -2879,7 +2888,7 @@ class BatsmanNotOutCommand : Command{
 
 We then write two classes BatsmanOutCommand and BatsmanNotOutCommand conforming to Command protocol. Both these classes take a parameter of type ScreenDisplay during their initialisation. Then we write the definition of execute method by calling isBatsmanOut/ isBatsmanNotOut on ScreenDisplay object.
 
-```
+```swift
 class DisplaySwitch {
     var command : Command
     
@@ -2896,7 +2905,7 @@ class DisplaySwitch {
 Finally, we write a class called DisplaySwitch which takes an object of type Command for its initialisation. We define a method called pressSwitch which implements the execute method on Command object.
 Let us write our main method and see our code in action.
 
-```
+```swift
 func main(){
     let screenDisplay = ScreenDisplay()
     
@@ -2939,7 +2948,7 @@ Assume we are making a list of top cricketers in current lot which includes thei
 
 Let us write some code now:
 
-```
+```swift
 import Foundation
 struct Cricketer{
     let name : String
@@ -2949,7 +2958,7 @@ struct Cricketer{
 
 We define a struct named Cricketer which stores name and team as String properties.
 
-```
+```swift
 struct Cricketers{
     let cricketers : [Cricketer]
 }
@@ -2957,7 +2966,7 @@ struct Cricketers{
 
 We define another struct named Cricketers which stores cricketers Array of custom type Cricketer.
 
-```
+```swift
 struct CricketersIterator : IteratorProtocol{
     
     private var current = 0
@@ -3002,7 +3011,7 @@ We define a method next which returns an object of type Cricketer (notice the op
 
 Let us now write our main method:
 
-```
+```swift
 func main(){
     let cricketers = Cricketers(cricketers: [Cricketer(name: "Kohli", team: "India"), Cricketer(name: "Steve", team: "Australia"), Cricketer(name: "Kane", team: "Kiwis"), Cricketer(name: "Root", team: "England")])
     for crick in cricketers{
@@ -3022,7 +3031,7 @@ Cricketer(name: "Root", team: "England")
  
 Adding the code snippet for another self explanatory example here which would enhance your understanding:
 
-```
+```swift
 import Foundation
  
 class Cricketer : Sequence
@@ -3106,7 +3115,7 @@ Usage:
 
 Let us use iterator design pattern to get a way to access the elements of a collection object in sequential manner without any need to know its underlying representation.
 
-```
+```swift
 import UIKit
 import Foundation
  
@@ -3122,7 +3131,7 @@ protocol Container{
 
 We define two protocols named Iterator and Container. Iterator has two functions to check if the there is next element present in array after every iteration and to return the element (if present). Container has a method to return the iterator.
 
-```
+```swift
 class NameRepo : Container{
     let names = ["India" ,"Australia", "England", "NewZealand"]
     func getIterator() -> Iterator {
@@ -3133,7 +3142,7 @@ class NameRepo : Container{
 
 We then define a class called NameRepo conforming to Container protocol. In our main function, we use iterator to print all the values present in names array.
 
-```
+```swift
 private class NameIterator : Iterator{
     var index = -1
     var names = [String]()
@@ -3164,7 +3173,7 @@ We define a class called NameIterator conforming to Iterator protocol. It takes 
  
 Let us write a main function to see the code in action:
 
-```
+```swift
 func main(){
     let nr = NameRepo()
     let iterator = NameIterator(nr.names)
@@ -3194,7 +3203,7 @@ Usage:
 Let us assume we are designing a TV Umpire decision review system for a cricket match. When an on-field umpire does not have enough evidence to rule a batsman out, he sends the request to TV umpire who takes a look at the replays and sends a command to the Monitor operator who displays the final decision on the big screen in the ground. 
 Let’s see how we can use Mediator design pattern to design such decision review system.
 
-```
+```swift
 import UIKit
 import Foundation
  
@@ -3206,7 +3215,7 @@ protocol Command{
  
 We write a protocol Command which defines a function called displayStatus.
 
-```
+```swift
 protocol RemoteUmpire{
     func registerTVDisplay(tvDisplay :TVDisplay)
     func registerTVOperator(tvOperator : TVOperator)
@@ -3222,7 +3231,7 @@ The remote umpire ( also called TV umpire) has to register for TV operator by pa
 A function named isDecisionMade which returns a boolean.
 Another function to set the status of decision by passing a boolean argument. 
 
-```
+```swift
 class TVOperator : Command{
     var tvUmpire:TVUmpire
     
@@ -3249,7 +3258,7 @@ We define a class called TVOperator conforming to Command protocol. It takes an 
  
 It has a method named displayStatus which based on tv umpire’s decision displays a batsman out or not on the big screen in the stadium.
 
-```
+```swift
 class TVDisplay : Command{
     var tvUmpire:TVUmpire
     
@@ -3267,7 +3276,7 @@ class TVDisplay : Command{
 
 We define a class called TVDisplay conforming to Command protocol. This class also takes an object of type TVUmpire (to be defined) for its initialisation. Its main functionality is to display the status of decision based on the input given by TV umpire.
 
-```
+```swift
 class TVUmpire : RemoteUmpire{
     private var tvOperator : TVOperator?
     private var tvDisplay : TVDisplay?
@@ -3298,7 +3307,7 @@ It registers for TV operator by assigning its property of tvOperator to paramete
  
 Let’s now write our main function and see how the above code comes into action.
 
-```
+```swift
 func main(){
     let tvUmpire = TVUmpire()
     let tvDisplayAtGround = TVDisplay(tvUmpire)
@@ -3342,7 +3351,7 @@ Assume we are adding the stats of a cricketer (number of runs scored) year by ye
  
 Let’s define a Memento class which takes an argument of number of runs scored in its initialisation.
 
-```
+```swift
 import UIKit
 class Memento {
     let numberOfRunsScored : Int
@@ -3355,7 +3364,7 @@ class Memento {
 
 Let’s assume an imaginary hardware named StatsHolder which displays the stats. It conforms to CustomStringConvertible protocol. It takes an argument of number of runs scored in its initialisation.
 
-```
+```swift
 class StatsHolder : CustomStringConvertible{
     
     private var numberOfRunsScored : Int
@@ -3381,7 +3390,7 @@ We maintain an array of snapshots of type Memento so that we can restore to past
  
 We now add function add stats which takes number of runs as parameter and returns us a snapshot of type Memento. 
 
-```
+```swift
 func addStatsToHolder (_ runsToBeAdded : Int) -> Memento{
         numberOfRunsScored += runsToBeAdded
         let snapshot = Memento(runsToBeAdded)
@@ -3395,7 +3404,7 @@ We keep appending the snapshot of Memento initialised to the array and increment
  
 We need a function that lets us restore to a past stat by passing a parameter of type Memento.
 
-```
+```swift
  func restoreToPastStat(_ memento : Memento?){
         if let snap = memento{
             numberOfRunsScored = snap.numberOfRunsScored
@@ -3409,7 +3418,7 @@ Note that memento parameter is optional because for the currentindex value of 0 
  
 Now, we need methods to undo and redo stats.
 
-```
+```swift
 func undoAStat() -> Memento?{
         if currentIndex > 0{
             currentIndex -= 1
@@ -3438,7 +3447,7 @@ In redoAStat methog, we check if the currentIndex is less than the the count of 
  
 We are done with our set up of Memento design pattern. Let’s see how we implement this pattern.
 
-```
+```swift
 func main(){
     let statsHolder = StatsHolder(1200) //1200 is the first stat (number of runs) we add to stats holder
     let stat1 = statsHolder.addStatsToHolder(1400)
@@ -3467,7 +3476,9 @@ We then undo the last two stat addition by using undoAStat method on statsHolder
  
 Now run the main() method.
 
-```main()```
+```swift
+main()
+```
 Output in the Xcode console:
 
 a -  Total Runs scored = 3300
@@ -3493,7 +3504,7 @@ Let’s see how this design pattern can be used in code.
 
 Assume we have a cricket match happening at a stadium and users receive live updates of the score on their devices (iPad or iPhone). By default, we show the score on the interface. But on iPad, along with the live score, we also show bowlers and batsman stats as there is available screen estate. But the same interface looks congested on iPhone display. So, we refrain ourselves from showing batsman and bowler stats for iPhone display. 
 
-```
+```swift
 import Foundation
  
 protocol Log
@@ -3506,7 +3517,7 @@ protocol Log
 
 We have a protocol named Log which defines two methods to show bowlers and batsmen stats from the current match which takes stats as input in String format. 
 
-```
+```swift
 class StatsDisplayLog : Log
 {
     func bowlerStatsFromCurrentMatch(_ stats: String) {
@@ -3528,7 +3539,7 @@ class NoDisplayStatsLog : Log
 
 We now define two classes StatsDisplayLog and NoDisplayStatsLog both conforming to Log protocol. The only difference is the implementation of these methods in the classes which is very straight forward. We show the stats in StatsDisplayLog and do not show any stats in NoDisplayStatsLog. 
 
-```
+```swift
 class UserInterface
 {
     var log: Log
@@ -3555,7 +3566,7 @@ class UserInterface
 We define a class called UserInterface which takes care of the logic behind what to display to the users on their devices. This class takes a parameter of type Log during its initialisation. There are two methods to update the number of wickets taken and number of runs scored as and when an event happens in the match. With the help of instance of Log class, these stats are shown on the interface.
 Let’s now write a function called main.
 
-```
+```swift
 func main()
 {
     let ipadLog = StatsDisplayLog()
@@ -3577,7 +3588,7 @@ Total Runs : 7
 Total Wickets : 1
 This is what an user sees on his iPad as we are taking an instance of StatsDisplayLog for iPad interface. Now, add the below code to the main function. 
 
-```
+```swift
 let iPhoneLog = NoDisplayStatsLog()
 let iPhoneUserInterface = UserInterface(iPhoneLog)
 iPhoneUserInterface.runsScored(numberOFRunsScored: 6)
@@ -3599,7 +3610,7 @@ Observer design pattern is used when we want an object (called as observable) , 
 
 Usage: 
 
-```
+```swift
 import Foundation
  
 protocol Invocable : class
@@ -3671,7 +3682,7 @@ Now, assume a cricket match going on in a ground. There is a scoreboard in the g
 
 Let us define scoreboard class.
 
-```
+```swift
 class ScoreBoardInTheGround{
     let batsmenHitRun = Event<Int>()
     init(){}
@@ -3685,7 +3696,7 @@ ScoreBoardInTheGround can be initialised without any arguments. It has an event 
  
 As and when scoreboard in the ground is updated, the same update has to reach the servers of a mobile app, where millions of people follow the match updates. There are many such servers which are called observers and they need to know whenever the state of ScoreBoardInTheGround changes. Let us define our observable class.
 
-```
+```swift
 class ScoreUpdateInServers{
     init(){
         let scoreBoard = ScoreBoardInTheGround()
@@ -3711,7 +3722,7 @@ Servers of the mobile app has a method to show score in the display which takes 
  
 Now, add the below code snippet to see the code in action.
 
-```
+```swift
 func main(){
     let dummy = ScoreUpdateInServers()
 }
@@ -3737,7 +3748,7 @@ Usage:
 
 Let’s assume a player auction going on for some private cricket league. A player is either in unsold state or sold state with the name of team attached to him. We now see how state design pattern can be used in this context.
 
-```
+```swift
 import UIKit
  
 protocol State {
@@ -3753,7 +3764,7 @@ whichTeam takes an object of type PlayerAuction (to be defined) and returns an o
 
 We then define states in which a player object can be in.
 
-```
+```swift
 class IsUnsoldState: State {
     func isSold(playerAuction: PlayerAuction) -> Bool { return false }
     
@@ -3782,7 +3793,7 @@ Second one is IsSoldState and it conforms to State protocol. It takes argument o
 
 We now define the most important class PlayerAuction:
 
-```
+```swift
 class PlayerAuction {
     private var state: State = IsUnsoldState()
     
@@ -3818,7 +3829,7 @@ changeStateToUnsold where player’s state is changed to instance of IsUnsoldSta
  
 Let us now write a main method to see this design pattern in action:
 
-```
+```swift
 func main(){
     let playerAuction = PlayerAuction()
     print(playerAuction.isSold, playerAuction.teamName)
@@ -3855,7 +3866,7 @@ Let us consider a situation where we are building a template for cricket team. T
  
 Let us see how we can use Template design pattern for the same use case.
 
-```
+```swift
 import UIKit
 import Foundation
  
@@ -3895,7 +3906,7 @@ We also define empty functions called pickBatsmen, pickBowlers, pickAllRounders 
  
 We now define three different classes with TeamTemplate as BaseClass where we write the concrete implementation of teamBuilding method.
  
-```
+```swift
 class SeamingPitchTeamTemplate : TeamTemplate{
     override func pickBatsmen() {
         print("Picking 6 batsmen")
@@ -3943,7 +3954,7 @@ We define three templates named, SeamingPitchTeamTemplate, SpinPitchTeamTemplate
  
 Let us now write our main method and see the code in action.
 
-```
+```swift
 func main(){
     var finalTeam : TeamTemplate = SeamingPitchTeamTemplate()
     finalTeam.buildTeam()
@@ -3967,7 +3978,7 @@ Team Set For the match
  
 Now, we change the team compositions by taking instances of other templates and observe the output.
 
-```
+```swift
 func main(){
     var finalTeam : TeamTemplate = SeamingPitchTeamTemplate()
     finalTeam.buildTeam()
@@ -4002,7 +4013,7 @@ Team Set For the match
  
 Now change the main method to:
 
-```
+```swift
 func main(){
     var finalTeam : TeamTemplate = SeamingPitchTeamTemplate()
     finalTeam.buildTeam()
@@ -4060,7 +4071,7 @@ Usage:
 
 Consider a situation where we are designing a checkout counter in a shop that sells cricket accessories. It offers discount on selective brands and selective items. Let us see how we can use Visitor pattern to design such system.
 
-```
+```swift
 import Foundation
 import UIKit
  
@@ -4071,7 +4082,7 @@ protocol CricketAccessory{
 
 We define a protocol called CricketAccessory with a function called accept which takes a parameter of type CheckoutCounter ( to be defined) and returns an integer.
 
-```
+```swift
 class CricketBat : CricketAccessory{
     private var price : Double
     private var brand : String
@@ -4096,7 +4107,7 @@ class CricketBat : CricketAccessory{
 
 We then define a class called CricketBat conforming to CricketAccessory protocol. It has two private variables defined namely, price of type Double and brand of type String. We also two define two public methods called getPrice and getBrand to return price and brand of the bat respectively.
 
-```
+```swift
 class CricketBall : CricketAccessory{
  
     private var type : String
@@ -4126,7 +4137,7 @@ class CricketBall : CricketAccessory{
 
 We define another class called CricketBall conforming to CricketAccessory protocol. This is very much similar to CricketBat class.
  
-```
+```swift
 protocol CheckoutCounter {
     func moveToCounter(bat : CricketBat) -> Int
     func moveToCounter(ball : CricketBall) -> Int
@@ -4136,7 +4147,7 @@ protocol CheckoutCounter {
 
 We define a protocol called CheckoutCounter which has two methods with the same name but differs when it comes to parameter types.
 
-```
+```swift
 class CashCounter :CheckoutCounter{
     func moveToCounter(bat: CricketBat) -> Int {
         var cost : Int = 0
@@ -4160,7 +4171,7 @@ class CashCounter :CheckoutCounter{
 
 We now define a class called CashCounter conforming to CheckoutCounter. We can see that, for a cricket bat of brand MRF we give a discount of 10%. In future, if we want to add any new brands or remove discount on existing brands, we can make all the changes here with no changes required at the client end.
 Let us now write main function to see the code in action:
-```
+```swift
 func main(){
     print("Main")
     func finalPriceCalculation(accessories : [CricketAccessory]) -> Int{
@@ -4206,7 +4217,7 @@ You can see MRF bat is checkout at discounted price.
  
 Let us now change the CashCounter class to following:
 
-```
+```swift
 class CashCounter :CheckoutCounter{
     func moveToCounter(bat: CricketBat) -> Int {
         var cost : Int = 0
